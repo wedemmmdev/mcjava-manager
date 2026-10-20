@@ -44,6 +44,12 @@ func IsPermissionError(err error) bool {
 	return errors.Is(err, fs.ErrPermission)
 }
 
+// WrapFSError converts filesystem permission failures into a PermissionError
+// with platform-specific guidance. Other errors are wrapped with context.
+func WrapFSError(operation, path string, err error) error {
+	return wrapFSError(operation, path, err)
+}
+
 func wrapFSError(operation, path string, err error) error {
 	if errors.Is(err, fs.ErrPermission) {
 		return &PermissionError{

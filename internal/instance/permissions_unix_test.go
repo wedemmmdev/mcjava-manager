@@ -6,6 +6,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -40,5 +41,29 @@ func TestPrepareReturnsPermissionError(t *testing.T) {
 	}
 	if !errors.Is(err, os.ErrPermission) {
 		t.Fatalf("Prepare() error = %v, want os.ErrPermission", err)
+	}
+}
+
+func TestExportedWrapFSError(t *testing.T) {
+	err := WrapFSError("gravar", "/tmp/arquivo", os.ErrPermission)
+	if !errors.Is(err, os.ErrPermission) {
+		t.Fatalf("WrapFSError() error = %v, want os.ErrPermission", err)
+	}
+
+	var permissionErr *PermissionError
+	if !errors.As(err, &permissionErr) {
+		t.Fatalf("WrapFSError() error = %T, want *PermissionError", err)
+	}
+	if !strings.Contains(err.Error(), "gravar") || !strings.Contains(err.Error(), "/tmp/arquivo") {
+		t.Fatalf("WrapFSError() error = %q, missing operation or path", err)
+	}
+
+	other := errors.New("falha qualquer")
+	wrapped := WrapFSError("gravar", "/tmp/arquivo", other)
+	if !errors.Is(wrapped, other) {
+		t.Fatalf("WrapFSError(other) = %v, want it to wrap the original error", wrapped)
+	}
+	if errors.As(wrapped, &permissionErr) {
+		t.Fatalf("WrapFSError(other) = %T, want a regular error", wrapped)
 	}
 }
