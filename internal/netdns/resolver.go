@@ -1,14 +1,19 @@
-// Package netdns provides HTTP transports with a resilient DNS resolver for
+// Package netdns provides HTTP transports with a public DNS resolver for
 // restricted environments such as Android/Shizuku, where the system-provided
 // resolver may point to an inaccessible loopback address.
 package netdns
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"errors"
 	"fmt"
 	"net"
 	"net/http"
+	"os"
+	"path/filepath"
+	"sync"
 	"time"
 )
 
@@ -21,11 +26,20 @@ const (
 	keepAlive      = 30 * time.Second
 )
 
+var (
+	androidCertDirs = []string{
+		"/system/etc/security/cacerts",
+		"/apex/com.android.conscrypt/cacerts",
+	}
+
+	rootCAsOnce sync.Once
+	rootCAsPool *x509.CertPool
+)
+
 type dialFunc func(ctx context.Context, network, address string) (net.Conn, error)
 
 // NewTransport returns an HTTP transport based on http.DefaultTransport that
-// tries the system-provided DNS server first and falls back to public
-// resolvers when it is unreachable.
+// resolves names through public DNS servers, bypassing the system resolver.
 func NewTransport() *http.Transport {
 	return newTransport(newDialer().DialContext)
 }
@@ -41,8 +55,8 @@ func newDialer() *net.Dialer {
 func newResolver(dial dialFunc) *net.Resolver {
 	return &net.Resolver{
 		PreferGo: true,
-		Dial: func(ctx context.Context, network, address string) (net.Conn, error) {
-			return dialWithFallback(ctx, network, address, dial)
+		Dial: func(ctx context.Context, network, _ string) (net.Conn, error) {
+			return dialWithFallback(ctx, network, dial)
 		},
 	}
 }
@@ -61,20 +75,58 @@ func newTransport(dial dialFunc) *http.Transport {
 	transport.IdleConnTimeout = 90 * time.Second
 	transport.TLSHandshakeTimeout = 10 * time.Second
 	transport.ExpectContinueTimeout = 1 * time.Second
+	transport.TLSClientConfig = &tls.Config{RootCAs: rootCAs()}
 
 	return transport
 }
 
-func dialWithFallback(ctx context.Context, network, address string, dial dialFunc) (net.Conn, error) {
-	candidates := dnsCandidates(address)
+func rootCAs() *x509.CertPool {
+	rootCAsOnce.Do(func() {
+		pool, err := x509.SystemCertPool()
+		if err != nil || pool == nil {
+			pool = x509.NewCertPool()
+		}
 
+		// Go's Linux certificate loader does not know about Android's hashed
+		// CA directory. Load it explicitly when running under Android.
+		for _, directory := range androidCertDirs {
+			appendCertsFromDirectory(pool, directory)
+		}
+
+		rootCAsPool = pool
+	})
+
+	return rootCAsPool
+}
+
+func appendCertsFromDirectory(pool *x509.CertPool, directory string) {
+	entries, err := os.ReadDir(directory)
+	if err != nil {
+		return
+	}
+
+	for _, entry := range entries {
+		if entry.IsDir() {
+			continue
+		}
+
+		data, err := os.ReadFile(filepath.Join(directory, entry.Name()))
+		if err != nil {
+			continue
+		}
+
+		pool.AppendCertsFromPEM(data)
+	}
+}
+
+func dialWithFallback(ctx context.Context, network string, dial dialFunc) (net.Conn, error) {
 	var lastErr error
-	for _, candidate := range candidates {
+	for _, address := range []string{googlePublicDNS, cloudflarePublicDNS} {
 		if err := ctx.Err(); err != nil {
 			return nil, err
 		}
 
-		conn, err := dial(ctx, network, candidate)
+		conn, err := dial(ctx, network, address)
 		if err == nil {
 			if conn == nil {
 				lastErr = errors.New("conexão DNS vazia")
@@ -87,27 +139,8 @@ func dialWithFallback(ctx context.Context, network, address string, dial dialFun
 	}
 
 	if lastErr == nil {
-		lastErr = errors.New("nenhum servidor DNS disponível")
+		lastErr = errors.New("nenhum servidor DNS público disponível")
 	}
 
-	return nil, fmt.Errorf("falha ao contatar servidores DNS: %w", lastErr)
-}
-
-func dnsCandidates(systemAddress string) []string {
-	candidates := make([]string, 0, 3)
-	seen := make(map[string]struct{}, 3)
-
-	for _, address := range []string{systemAddress, googlePublicDNS, cloudflarePublicDNS} {
-		if address == "" {
-			continue
-		}
-		if _, ok := seen[address]; ok {
-			continue
-		}
-
-		seen[address] = struct{}{}
-		candidates = append(candidates, address)
-	}
-
-	return candidates
+	return nil, fmt.Errorf("falha ao contatar servidores DNS públicos: %w", lastErr)
 }

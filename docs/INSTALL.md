@@ -290,7 +290,7 @@ Em algumas instalações, o Termux não consegue acessar ou executar arquivos em
 
 Para contornar essa restrição, copie o binário para `/data/local/tmp/`, que permite execução nativa pelo usuário do Shizuku.
 
-Os clientes HTTP do binário usam primeiro o DNS configurado no sistema. Se a conexão com esse DNS falhar, eles recorrem a `8.8.8.8:53` e `1.1.1.1:53`, evitando o erro de `connection refused` no ambiente do Shizuku.
+Os clientes HTTP do binário usam resolvedores públicos (`8.8.8.8:53` e `1.1.1.1:53`) e não dependem do DNS do sistema, evitando o erro de `connection refused` em `[::1]:53` no ambiente do Shizuku. Eles também carregam os certificados de `/system/etc/security/cacerts`, necessários para validar HTTPS quando o usuário `shell` não consegue usar o armazenamento de certificados padrão.
 
 1. Copie o binário do Termux para uma pasta pública:
 

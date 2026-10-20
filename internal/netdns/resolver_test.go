@@ -9,14 +9,13 @@ import (
 	"time"
 )
 
-func TestDialWithFallbackUsesSystemResolverFirst(t *testing.T) {
+func TestDialWithFallbackUsesGoogleFirst(t *testing.T) {
 	var calls []string
 	conn := newTestConn(t)
 
 	got, err := dialWithFallback(
 		context.Background(),
 		"udp",
-		"[::1]:53",
 		func(_ context.Context, network, address string) (net.Conn, error) {
 			calls = append(calls, network+" "+address)
 			return conn, nil
@@ -28,24 +27,23 @@ func TestDialWithFallbackUsesSystemResolverFirst(t *testing.T) {
 	if got != conn {
 		t.Fatalf("dialWithFallback() returned a different connection")
 	}
-	if want := []string{"udp [::1]:53"}; !slices.Equal(calls, want) {
+	if want := []string{"udp " + googlePublicDNS}; !slices.Equal(calls, want) {
 		t.Fatalf("dial calls = %v, want %v", calls, want)
 	}
 }
 
-func TestDialWithFallbackTriesPublicDNSWhenSystemFails(t *testing.T) {
+func TestDialWithFallbackTriesCloudflareWhenGoogleFails(t *testing.T) {
 	var calls []string
 	conn := newTestConn(t)
-	systemErr := errors.New("connection refused")
+	googleErr := errors.New("google unavailable")
 
 	got, err := dialWithFallback(
 		context.Background(),
 		"udp",
-		"[::1]:53",
 		func(_ context.Context, network, address string) (net.Conn, error) {
 			calls = append(calls, network+" "+address)
-			if address == "[::1]:53" {
-				return nil, systemErr
+			if address == googlePublicDNS {
+				return nil, googleErr
 			}
 
 			return conn, nil
@@ -57,7 +55,7 @@ func TestDialWithFallbackTriesPublicDNSWhenSystemFails(t *testing.T) {
 	if got != conn {
 		t.Fatalf("dialWithFallback() returned a different connection")
 	}
-	if want := []string{"udp [::1]:53", "udp " + googlePublicDNS}; !slices.Equal(calls, want) {
+	if want := []string{"udp " + googlePublicDNS, "udp " + cloudflarePublicDNS}; !slices.Equal(calls, want) {
 		t.Fatalf("dial calls = %v, want %v", calls, want)
 	}
 }
@@ -69,7 +67,6 @@ func TestDialWithFallbackTriesAllCandidates(t *testing.T) {
 	_, err := dialWithFallback(
 		context.Background(),
 		"udp",
-		"[::1]:53",
 		func(_ context.Context, network, address string) (net.Conn, error) {
 			calls = append(calls, network+" "+address)
 			return nil, dialErr
@@ -82,52 +79,9 @@ func TestDialWithFallbackTriesAllCandidates(t *testing.T) {
 		t.Fatalf("dialWithFallback() error = %v, want it to wrap %v", err, dialErr)
 	}
 	if want := []string{
-		"udp [::1]:53",
 		"udp " + googlePublicDNS,
 		"udp " + cloudflarePublicDNS,
 	}; !slices.Equal(calls, want) {
-		t.Fatalf("dial calls = %v, want %v", calls, want)
-	}
-}
-
-func TestDialWithFallbackSkipsDuplicateAddress(t *testing.T) {
-	var calls []string
-	conn := newTestConn(t)
-
-	_, err := dialWithFallback(
-		context.Background(),
-		"udp",
-		googlePublicDNS,
-		func(_ context.Context, network, address string) (net.Conn, error) {
-			calls = append(calls, network+" "+address)
-			return conn, nil
-		},
-	)
-	if err != nil {
-		t.Fatalf("dialWithFallback() error = %v", err)
-	}
-	if want := []string{"udp " + googlePublicDNS}; !slices.Equal(calls, want) {
-		t.Fatalf("dial calls = %v, want %v", calls, want)
-	}
-}
-
-func TestDialWithFallbackWithEmptySystemAddress(t *testing.T) {
-	var calls []string
-	conn := newTestConn(t)
-
-	_, err := dialWithFallback(
-		context.Background(),
-		"udp",
-		"",
-		func(_ context.Context, network, address string) (net.Conn, error) {
-			calls = append(calls, network+" "+address)
-			return conn, nil
-		},
-	)
-	if err != nil {
-		t.Fatalf("dialWithFallback() error = %v", err)
-	}
-	if want := []string{"udp " + googlePublicDNS}; !slices.Equal(calls, want) {
 		t.Fatalf("dial calls = %v, want %v", calls, want)
 	}
 }
@@ -139,7 +93,6 @@ func TestDialWithFallbackStopsOnCanceledContext(t *testing.T) {
 	_, err := dialWithFallback(
 		ctx,
 		"udp",
-		"[::1]:53",
 		func(context.Context, string, string) (net.Conn, error) {
 			t.Fatal("dial called after context cancellation")
 			return nil, nil
@@ -203,6 +156,12 @@ func TestNewTransportConfiguresHTTPTransport(t *testing.T) {
 	if transport.ExpectContinueTimeout != time.Second {
 		t.Fatalf("NewTransport().ExpectContinueTimeout = %v, want 1s", transport.ExpectContinueTimeout)
 	}
+	if transport.TLSClientConfig == nil {
+		t.Fatal("NewTransport().TLSClientConfig = nil, want TLS configuration")
+	}
+	if transport.TLSClientConfig.RootCAs == nil {
+		t.Fatal("NewTransport().TLSClientConfig.RootCAs = nil, want CA roots")
+	}
 }
 
 func TestNewTransportUsesProvidedDialer(t *testing.T) {
@@ -214,14 +173,14 @@ func TestNewTransportUsesProvidedDialer(t *testing.T) {
 		return conn, nil
 	})
 
-	got, err := transport.DialContext(context.Background(), "udp", googlePublicDNS)
+	got, err := transport.DialContext(context.Background(), "udp", "example.com:53")
 	if err != nil {
 		t.Fatalf("transport.DialContext() error = %v", err)
 	}
 	if got != conn {
 		t.Fatal("transport.DialContext() returned a different connection")
 	}
-	if want := []string{"udp " + googlePublicDNS}; !slices.Equal(calls, want) {
+	if want := []string{"udp example.com:53"}; !slices.Equal(calls, want) {
 		t.Fatalf("dial calls = %v, want %v", calls, want)
 	}
 }
