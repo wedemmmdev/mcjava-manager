@@ -1,4 +1,4 @@
-# mcjava-manager
+# Modink
 
 Gerenciador de conteúdo para instâncias do Minecraft Java, com interface de linha de comando (CLI) e interface interativa no terminal (TUI).
 
@@ -24,7 +24,7 @@ O projeto instala, lista, atualiza e remove mods, shader packs e resource packs 
 
 ## Visão geral
 
-O `mcjava-manager` foi feito para quem quer cuidar do conteúdo de uma instância sem abrir o navegador, sem baixar arquivos manualmente e sem depender de ferramentas externas como `curl`, `wget` ou `unzip`.
+O **Modink** foi feito para quem quer cuidar do conteúdo de uma instância sem abrir o navegador, sem baixar arquivos manualmente e sem depender de ferramentas externas como `curl`, `wget` ou `unzip`.
 
 O programa:
 
@@ -32,7 +32,7 @@ O programa:
 - cria automaticamente `mods/`, `shaderpacks/`, `resourcepacks/` e `saves/` quando necessário;
 - consulta o Modrinth para buscar projetos e versões compatíveis;
 - baixa os arquivos por HTTP com verificação de checksum;
-- registra cada instalação em `.mcjava-manager/installed.json`;
+- registra cada instalação em `.modink/installed.json`;
 - distingue conteúdo gerenciado de arquivos que já estavam na pasta;
 - pode ser compilado como um binário estático, sem `cgo`.
 
@@ -79,7 +79,7 @@ A pasta `saves/` é criada para manter o layout esperado da instância. A instal
 Requer Go 1.24.2 ou superior:
 
 ```bash
-go install github.com/wedemmmdev/mcjava-manager/cmd/mcjava-manager@latest
+go install github.com/wedemmmdev/modink/cmd/modink@latest
 ```
 
 O binário é colocado em `$(go env GOPATH)/bin`, normalmente `~/go/bin`. Se essa pasta não estiver no `PATH`:
@@ -97,18 +97,18 @@ $env:Path += ";$env:USERPROFILE\go\bin"
 ### Opção 2: compilar o código-fonte
 
 ```bash
-git clone https://github.com/wedemmmdev/mcjava-manager.git
-cd mcjava-manager
-CGO_ENABLED=0 go build -buildvcs=false -trimpath -ldflags="-s -w" -o mcjava-manager ./cmd/mcjava-manager
+git clone https://github.com/wedemmmdev/modink.git
+cd modink
+CGO_ENABLED=0 go build -buildvcs=false -trimpath -ldflags="-s -w" -o modink ./cmd/modink
 ```
 
 No Windows (PowerShell):
 
 ```powershell
-git clone https://github.com/wedemmmdev/mcjava-manager.git
-cd mcjava-manager
+git clone https://github.com/wedemmmdev/modink.git
+cd modink
 $env:CGO_ENABLED = "0"
-go build -buildvcs=false -trimpath -ldflags="-s -w" -o mcjava-manager.exe .\cmd\mcjava-manager
+go build -buildvcs=false -trimpath -ldflags="-s -w" -o modink.exe .\cmd\modink
 ```
 
 O projeto ainda não publica releases binárias oficiais. As instruções completas para cada plataforma, incluindo Termux, macOS, Windows e compilação cruzada, estão em [docs/INSTALL.md](docs/INSTALL.md).
@@ -116,8 +116,8 @@ O projeto ainda não publica releases binárias oficiais. As instruções comple
 ### Verificar a instalação
 
 ```bash
-mcjava-manager version
-mcjava-manager --help
+modink version
+modink --help
 ```
 
 ## Primeiros passos
@@ -127,13 +127,13 @@ mcjava-manager --help
 Informe o caminho de uma instância existente:
 
 ```bash
-mcjava-manager --instance /caminho/da/instancia
+modink --instance /caminho/da/instancia
 ```
 
 ou, usando o argumento posicional:
 
 ```bash
-mcjava-manager /caminho/da/instancia
+modink /caminho/da/instancia
 ```
 
 Sem uma instância, o comando raiz exibe a ajuda. A TUI só é aberta quando um caminho é informado. A instância pode ser de qualquer loader ou até uma pasta organizada manualmente; o programa não tenta adivinhar o loader.
@@ -142,36 +142,36 @@ Sem uma instância, o comando raiz exibe a ajuda. A TUI só é aberta quando um 
 
 ```bash
 # Buscar um mod compatível
-mcjava-manager search sodium --loader fabric --game-version 1.21.1
+modink search sodium --loader fabric --game-version 1.21.1
 
 # Ver detalhes e versões
-mcjava-manager info sodium
-mcjava-manager versions sodium --loader fabric --game-version 1.21.1 --channel release
+modink info sodium
+modink versions sodium --loader fabric --game-version 1.21.1 --channel release
 
 # Instalar
-mcjava-manager install sodium \
+modink install sodium \
   --instance /caminho/da/instancia \
   --game-version 1.21.1 \
   --loader fabric
 
 # Conferir o que está instalado
-mcjava-manager list --instance /caminho/da/instancia
+modink list --instance /caminho/da/instancia
 
 # Verificar atualizações sem baixar nada
-mcjava-manager update --instance /caminho/da/instancia --check
+modink update --instance /caminho/da/instancia --check
 
 # Atualizar
-mcjava-manager update --instance /caminho/da/instancia
+modink update --instance /caminho/da/instancia
 
 # Remover
-mcjava-manager remove sodium --instance /caminho/da/instancia
+modink remove sodium --instance /caminho/da/instancia
 ```
 
 A instância também pode ser definida pela variável de ambiente:
 
 ```bash
-export MCJAVA_MANAGER_INSTANCE="$HOME/.local/share/PrismLauncher/instances/MinhaInstancia/minecraft"
-mcjava-manager list
+export MODINK_INSTANCE="$HOME/.local/share/PrismLauncher/instances/MinhaInstancia/minecraft"
+modink list
 ```
 
 ## Interface interativa
@@ -216,7 +216,7 @@ A busca da TUI mostra até os 50 primeiros resultados do Modrinth e informa o to
 
 | Comando | Descrição |
 | --- | --- |
-| `mcjava-manager [instância]` | Abre a TUI para a instância informada |
+| `modink [instância]` | Abre a TUI para a instância informada |
 | `search [termo]` | Busca projetos no provedor |
 | `info <slug\|id>` | Exibe detalhes de um projeto |
 | `versions <slug\|id>` | Lista versões disponíveis |
@@ -233,8 +233,8 @@ A referência completa de flags, exemplos e comportamentos está em [docs/USAGE.
 
 | Flag | Descrição |
 | --- | --- |
-| `-i, --instance <caminho>` | Caminho da instância (env: `MCJAVA_MANAGER_INSTANCE`) |
-| `--config <arquivo>` | Arquivo de configuração (env: `MCJAVA_MANAGER_CONFIG`) |
+| `-i, --instance <caminho>` | Caminho da instância (env: `MODINK_INSTANCE`) |
+| `--config <arquivo>` | Arquivo de configuração (env: `MODINK_CONFIG`) |
 | `--no-color` | Desativa cores e estilos visuais |
 | `-v, --verbose` | Flag reservada para logs detalhados; nesta versão ainda não altera a saída |
 | `-h, --help` | Ajuda |
@@ -249,9 +249,9 @@ O Modrinth não exige chave de API. Nenhuma configuração é necessária para u
 A estrutura de configuração do CurseForge já existe e segue esta precedência:
 
 1. variável de ambiente `CURSEFORGE_API_KEY`;
-2. arquivo `~/.mcjava-manager.yaml` (ou o caminho informado em `--config`).
+2. arquivo `~/.modink.yaml` (ou o caminho informado em `--config`).
 
-Como o adaptador CurseForge ainda não foi conectado à CLI, nenhum comando atual lê o arquivo de configuração. A flag `--config` e a variável `MCJAVA_MANAGER_CONFIG` já são resolvidas e ficam reservadas para essa integração.
+Como o adaptador CurseForge ainda não foi conectado à CLI, nenhum comando atual lê o arquivo de configuração. A flag `--config` e a variável `MODINK_CONFIG` já são resolvidas e ficam reservadas para essa integração.
 
 Exemplo de arquivo:
 
@@ -263,12 +263,12 @@ curseforge:
 Restrinja o acesso ao arquivo em sistemas Unix:
 
 ```bash
-chmod 600 ~/.mcjava-manager.yaml
+chmod 600 ~/.modink.yaml
 ```
 
 > **Importante:** o adaptador CurseForge ainda não está implementado. Hoje, `--provider curseforge` retorna uma mensagem informando que o provedor não está disponível. A configuração e a resolução de chave estão preparadas para quando o adaptador for adicionado.
 
-Nunca faça commit de chaves de API. O arquivo `.mcjava-manager.yaml`, `.env` e arquivos semelhantes já estão no `.gitignore`.
+Nunca faça commit de chaves de API. O arquivo `.modink.yaml`, `.env` e arquivos semelhantes já estão no `.gitignore`.
 
 ## Manifesto e segurança
 
@@ -280,7 +280,7 @@ O estado do conteúdo gerenciado fica dentro da instância:
 ├── shaderpacks/
 ├── resourcepacks/
 ├── saves/
-└── .mcjava-manager/
+└── .modink/
     └── installed.json
 ```
 
@@ -294,7 +294,7 @@ O manifesto registra, para cada arquivo:
 - tamanho e checksums;
 - datas de instalação e atualização.
 
-O arquivo é validado e salvo de forma atômica. Não edite o manifesto manualmente enquanto o gerenciador estiver em uso. Se precisar fazer backup, copie `.mcjava-manager/installed.json` com a instância fechada.
+O arquivo é validado e salvo de forma atômica. Não edite o manifesto manualmente enquanto o gerenciador estiver em uso. Se precisar fazer backup, copie `.modink/installed.json` com a instância fechada.
 
 Medidas de segurança implementadas:
 
@@ -310,7 +310,7 @@ Medidas de segurança implementadas:
 ## Como o projeto funciona
 
 ```text
-cmd/mcjava-manager/   Ponto de entrada
+cmd/modink/   Ponto de entrada
 internal/cli/         Comandos Cobra, TUI e regras de instalação/update/remove
 internal/config/      Configuração local e resolução segura de credenciais
 internal/download/    Download HTTP, checksums, nomes seguros e escrita atômica
@@ -344,14 +344,14 @@ go test -race ./...
 Build estático:
 
 ```bash
-CGO_ENABLED=0 go build -buildvcs=false -trimpath -ldflags="-s -w" -o mcjava-manager ./cmd/mcjava-manager
+CGO_ENABLED=0 go build -buildvcs=false -trimpath -ldflags="-s -w" -o modink ./cmd/modink
 ```
 
 Build cruzado para Windows:
 
 ```bash
 CGO_ENABLED=0 GOOS=windows GOARCH=amd64 \
-  go build -buildvcs=false -trimpath -ldflags="-s -w" -o mcjava-manager.exe ./cmd/mcjava-manager
+  go build -buildvcs=false -trimpath -ldflags="-s -w" -o modink.exe ./cmd/modink
 ```
 
 Os testes de clientes HTTP usam `httptest.Server` e não dependem da API real. Contribuições devem seguir Conventional Commits, manter o código formatado e incluir testes para lógica crítica.

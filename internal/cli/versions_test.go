@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/wedemmmdev/mcjava-manager/pkg/modsource"
+	"github.com/wedemmmdev/modink/pkg/modsource"
 )
 
 func executeVersionsCommand(t *testing.T, client modsource.Client, args ...string) (string, string, error) {

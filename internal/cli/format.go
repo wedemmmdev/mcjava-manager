@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/wedemmmdev/mcjava-manager/pkg/modsource"
+	"github.com/wedemmmdev/modink/pkg/modsource"
 )
 
 func providerDisplayName(provider modsource.Provider) string {

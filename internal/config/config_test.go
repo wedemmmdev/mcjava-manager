@@ -13,7 +13,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/wedemmmdev/mcjava-manager/pkg/modsource"
+	"github.com/wedemmmdev/modink/pkg/modsource"
 )
 
 func writeConfigFile(t *testing.T, content string, mode os.FileMode) string {
@@ -312,11 +312,11 @@ func TestSecretEmpty(t *testing.T) {
 }
 
 func TestMissingAPIKeyErrorMessage(t *testing.T) {
-	err := &MissingAPIKeyError{ConfigPath: "/home/user/.mcjava-manager.yaml"}
+	err := &MissingAPIKeyError{ConfigPath: "/home/user/.modink.yaml"}
 
 	for _, fragment := range []string{
 		EnvCurseForgeAPIKey,
-		"/home/user/.mcjava-manager.yaml",
+		"/home/user/.modink.yaml",
 		"curseforge:",
 		"api_key:",
 		"https://console.curseforge.com/",

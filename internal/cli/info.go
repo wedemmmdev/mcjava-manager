@@ -7,7 +7,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/wedemmmdev/mcjava-manager/pkg/modsource"
+	"github.com/wedemmmdev/modink/pkg/modsource"
 )
 
 type infoOptions struct {
@@ -26,9 +26,9 @@ resumo, licença, categorias, loaders, versões do jogo e links.
 
 Use --description para imprimir também a descrição completa mantida pelo
 provedor.`,
-		Example: `  mcjava-manager info sodium
-  mcjava-manager info sodium --description
-  mcjava-manager info AANobbMI`,
+		Example: `  modink info sodium
+  modink info sodium --description
+  modink info AANobbMI`,
 		Args:          cobra.ExactArgs(1),
 		SilenceErrors: true,
 		SilenceUsage:  true,

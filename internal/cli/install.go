@@ -9,10 +9,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/wedemmmdev/mcjava-manager/internal/download"
-	"github.com/wedemmmdev/mcjava-manager/internal/instance"
-	"github.com/wedemmmdev/mcjava-manager/internal/manifest"
-	"github.com/wedemmmdev/mcjava-manager/pkg/modsource"
+	"github.com/wedemmmdev/modink/internal/download"
+	"github.com/wedemmmdev/modink/internal/instance"
+	"github.com/wedemmmdev/modink/internal/manifest"
+	"github.com/wedemmmdev/modink/pkg/modsource"
 )
 
 var errInstallUnsupportedKind = errors.New("tipo de conteúdo não suportado para instalação")
@@ -36,11 +36,11 @@ func newInstallCommand(client modsource.Client, globalOpts *options, downloader 
 		Long: `Instala um mod, shader ou resource pack em uma instância do Minecraft.
 
 A instância deve ser informada com --instance ou pela variável de ambiente
-MCJAVA_MANAGER_INSTANCE.
+MODINK_INSTANCE.
 
 Sem --version, a versão release mais recente compatível com --game-version e
 --loader é selecionada. Use --version para instalar um ID específico listado
-por "mcjava-manager versions"; nesse caso, os filtros informados são apenas
+por "modink versions"; nesse caso, os filtros informados são apenas
 validados contra a versão escolhida.
 
 Dependências obrigatórias são resolvidas e instaladas antes do projeto
@@ -54,10 +54,10 @@ Um arquivo não rastreado com o mesmo nome só é substituído com --overwrite.
 Os checksums SHA1/SHA512 publicados pelo provedor são verificados antes da
 instalação. O arquivo e os metadados são registrados no manifesto local da
 instância.`,
-		Example: `  mcjava-manager install sodium --instance ./minha-instancia --game-version 1.21.1 --loader fabric
-  mcjava-manager install sodium --instance ./minha-instancia --version SMxNOGZ6
-  mcjava-manager install sodium --instance ./minha-instancia --no-dependencies
-  mcjava-manager install sodium --instance ./minha-instancia --overwrite`,
+		Example: `  modink install sodium --instance ./minha-instancia --game-version 1.21.1 --loader fabric
+  modink install sodium --instance ./minha-instancia --version SMxNOGZ6
+  modink install sodium --instance ./minha-instancia --no-dependencies
+  modink install sodium --instance ./minha-instancia --overwrite`,
 		Args:          cobra.ExactArgs(1),
 		SilenceErrors: true,
 		SilenceUsage:  true,

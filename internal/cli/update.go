@@ -12,10 +12,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/wedemmmdev/mcjava-manager/internal/download"
-	"github.com/wedemmmdev/mcjava-manager/internal/instance"
-	"github.com/wedemmmdev/mcjava-manager/internal/manifest"
-	"github.com/wedemmmdev/mcjava-manager/pkg/modsource"
+	"github.com/wedemmmdev/modink/internal/download"
+	"github.com/wedemmmdev/modink/internal/instance"
+	"github.com/wedemmmdev/modink/internal/manifest"
+	"github.com/wedemmmdev/modink/pkg/modsource"
 )
 
 type updateOptions struct {
@@ -45,10 +45,10 @@ sobrescrever esses filtros. Use --check para apenas exibir o que seria feito.
 
 Dependências obrigatórias das novas versões são instaladas ou atualizadas
 automaticamente. Use --no-dependencies para desativar esse comportamento.`,
-		Example: `  mcjava-manager update --instance ./minha-instancia
-  mcjava-manager update sodium --instance ./minha-instancia
-  mcjava-manager update --instance ./minha-instancia --check
-  mcjava-manager update sodium --instance ./minha-instancia --channel release`,
+		Example: `  modink update --instance ./minha-instancia
+  modink update sodium --instance ./minha-instancia
+  modink update --instance ./minha-instancia --check
+  modink update sodium --instance ./minha-instancia --channel release`,
 		Args:          cobra.ArbitraryArgs,
 		SilenceErrors: true,
 		SilenceUsage:  true,

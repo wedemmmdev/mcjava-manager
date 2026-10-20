@@ -8,9 +8,9 @@ import (
 	"path"
 	"strings"
 
-	"github.com/wedemmmdev/mcjava-manager/internal/instance"
-	"github.com/wedemmmdev/mcjava-manager/internal/manifest"
-	"github.com/wedemmmdev/mcjava-manager/pkg/modsource"
+	"github.com/wedemmmdev/modink/internal/instance"
+	"github.com/wedemmmdev/modink/internal/manifest"
+	"github.com/wedemmmdev/modink/pkg/modsource"
 )
 
 type managedFolder struct {

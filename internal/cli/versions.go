@@ -9,8 +9,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/wedemmmdev/mcjava-manager/pkg/modrinth"
-	"github.com/wedemmmdev/mcjava-manager/pkg/modsource"
+	"github.com/wedemmmdev/modink/pkg/modrinth"
+	"github.com/wedemmmdev/modink/pkg/modsource"
 )
 
 type versionsOptions struct {
@@ -35,10 +35,10 @@ func newVersionsCommand(client modsource.Client) *cobra.Command {
 
 É possível filtrar por versão do Minecraft, loader e canal de lançamento.
 A paginação é aplicada localmente sobre a lista retornada pelo provedor.`,
-		Example: `  mcjava-manager versions sodium
-  mcjava-manager versions sodium --game-version 1.20.1 --loader fabric
-  mcjava-manager versions sodium --channel release --limit 10
-  mcjava-manager versions sodium --offset 20`,
+		Example: `  modink versions sodium
+  modink versions sodium --game-version 1.20.1 --loader fabric
+  modink versions sodium --channel release --limit 10
+  modink versions sodium --offset 20`,
 		Args:          cobra.ExactArgs(1),
 		SilenceErrors: true,
 		SilenceUsage:  true,

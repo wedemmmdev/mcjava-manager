@@ -15,10 +15,10 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/muesli/termenv"
 
-	"github.com/wedemmmdev/mcjava-manager/internal/download"
-	"github.com/wedemmmdev/mcjava-manager/internal/instance"
-	"github.com/wedemmmdev/mcjava-manager/internal/manifest"
-	"github.com/wedemmmdev/mcjava-manager/pkg/modsource"
+	"github.com/wedemmmdev/modink/internal/download"
+	"github.com/wedemmmdev/modink/internal/instance"
+	"github.com/wedemmmdev/modink/internal/manifest"
+	"github.com/wedemmmdev/modink/pkg/modsource"
 )
 
 func newTUITestModel(t *testing.T, client modsource.Client, downloader *download.Client) *tuiModel {
@@ -620,7 +620,7 @@ func TestTUIViewRendersTabsAndHelp(t *testing.T) {
 	model := newTUITestModel(t, &fakeProviderClient{}, nil)
 
 	view := model.View()
-	for _, fragment := range []string{"mcjava-manager", "Buscar", "Instalados", "Resultados"} {
+	for _, fragment := range []string{"Modink", "Buscar", "Instalados", "Resultados"} {
 		if !strings.Contains(view, fragment) {
 			t.Fatalf("view is missing %q:\n%s", fragment, view)
 		}

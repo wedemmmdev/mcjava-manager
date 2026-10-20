@@ -13,10 +13,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/wedemmmdev/mcjava-manager/internal/download"
-	"github.com/wedemmmdev/mcjava-manager/internal/instance"
-	"github.com/wedemmmdev/mcjava-manager/internal/manifest"
-	"github.com/wedemmmdev/mcjava-manager/pkg/modsource"
+	"github.com/wedemmmdev/modink/internal/download"
+	"github.com/wedemmmdev/modink/internal/instance"
+	"github.com/wedemmmdev/modink/internal/manifest"
+	"github.com/wedemmmdev/modink/pkg/modsource"
 )
 
 type listOptions struct {
@@ -37,12 +37,12 @@ func newListCommand(globalOpts *options) *cobra.Command {
 		Short: "Lista o conteúdo instalado na instância",
 		Long: `Lista os mods, shaders e resource packs registrados no manifesto da
 instância. Arquivos presentes nas pastas gerenciadas que não foram instalados
-pelo mcjava-manager também são exibidos como não rastreados.
+pelo Modink também são exibidos como não rastreados.
 
 Use --type para limitar a listagem a um tipo de conteúdo.`,
-		Example: `  mcjava-manager list --instance ./minha-instancia
-  mcjava-manager list --instance ./minha-instancia --type mod
-  mcjava-manager list --instance ./minha-instancia --type shader`,
+		Example: `  modink list --instance ./minha-instancia
+  modink list --instance ./minha-instancia --type mod
+  modink list --instance ./minha-instancia --type shader`,
 		Args:          cobra.NoArgs,
 		SilenceErrors: true,
 		SilenceUsage:  true,
@@ -192,7 +192,7 @@ func scanUntrackedFiles(inst *instance.Instance, store *manifest.Store, kind mod
 				continue
 			}
 			name := entry.Name()
-			if strings.HasPrefix(name, ".mcjava-manager-") {
+			if strings.HasPrefix(name, ".modink-") {
 				continue
 			}
 			if _, err := download.SafeFilename(name); err != nil {

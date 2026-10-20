@@ -6,7 +6,7 @@
 *.exe
 
 # Local configuration may contain API keys; never commit it.
-.mcjava-manager.yaml
+.modink.yaml
 .env
 .env.*
 

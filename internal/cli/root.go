@@ -9,7 +9,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/wedemmmdev/mcjava-manager/internal/version"
+	"github.com/wedemmmdev/modink/internal/version"
 )
 
 // options contains the global flags shared by every command.
@@ -24,24 +24,24 @@ func (a *App) newRootCommand() *cobra.Command {
 	opts := &options{}
 
 	cmd := &cobra.Command{
-		Use:     "mcjava-manager [instância]",
+		Use:     "modink [instância]",
 		Short:   "Gerencie mods, shaders, resourcepacks e mapas de instâncias Minecraft Java",
 		Version: version.Short(),
-		Long: `mcjava-manager gerencia mods, shaders, resourcepacks e mapas de instâncias
+		Long: `Modink gerencia mods, shaders, resourcepacks e mapas de instâncias
 do Minecraft Java diretamente pelo terminal.
 
 A instância pode ser informada como argumento posicional ou pela flag
 persistente --instance.`,
-		Example: `  mcjava-manager ./fabric-loader-0.19.5-1.20.1
-  mcjava-manager --instance ./fabric-loader-0.19.5-1.20.1 version
-  mcjava-manager search sodium --loader fabric --game-version 1.20.1
-  mcjava-manager info sodium
-  mcjava-manager versions sodium --game-version 1.20.1 --loader fabric
-  mcjava-manager install sodium --instance ./fabric-loader-0.19.5-1.20.1 --game-version 1.20.1 --loader fabric
-  mcjava-manager list --instance ./fabric-loader-0.19.5-1.20.1
-  mcjava-manager update --instance ./fabric-loader-0.19.5-1.20.1 --check
-  mcjava-manager remove sodium --instance ./fabric-loader-0.19.5-1.20.1
-  mcjava-manager version`,
+		Example: `  modink ./fabric-loader-0.19.5-1.20.1
+  modink --instance ./fabric-loader-0.19.5-1.20.1 version
+  modink search sodium --loader fabric --game-version 1.20.1
+  modink info sodium
+  modink versions sodium --game-version 1.20.1 --loader fabric
+  modink install sodium --instance ./fabric-loader-0.19.5-1.20.1 --game-version 1.20.1 --loader fabric
+  modink list --instance ./fabric-loader-0.19.5-1.20.1
+  modink update --instance ./fabric-loader-0.19.5-1.20.1 --check
+  modink remove sodium --instance ./fabric-loader-0.19.5-1.20.1
+  modink version`,
 		Args:          cobra.MaximumNArgs(1),
 		SilenceErrors: true,
 		SilenceUsage:  true,
@@ -59,12 +59,12 @@ persistente --instance.`,
 	}
 
 	flags := cmd.PersistentFlags()
-	flags.StringVarP(&opts.InstancePath, "instance", "i", "", "caminho da instância do Minecraft (env: MCJAVA_MANAGER_INSTANCE)")
-	flags.StringVar(&opts.ConfigPath, "config", "", "arquivo de configuração (padrão: ~/.mcjava-manager.yaml, env: MCJAVA_MANAGER_CONFIG)")
+	flags.StringVarP(&opts.InstancePath, "instance", "i", "", "caminho da instância do Minecraft (env: MODINK_INSTANCE)")
+	flags.StringVar(&opts.ConfigPath, "config", "", "arquivo de configuração (padrão: ~/.modink.yaml, env: MODINK_CONFIG)")
 	flags.BoolVarP(&opts.Verbose, "verbose", "v", false, "exibe logs detalhados")
 	flags.BoolVar(&opts.NoColor, "no-color", false, "desativa cores e estilos visuais")
 
-	cmd.SetVersionTemplate("mcjava-manager {{.Version}}\n")
+	cmd.SetVersionTemplate("Modink {{.Version}}\n")
 	cmd.AddCommand(newVersionCommand())
 	cmd.AddCommand(newSearchCommand(nil))
 	cmd.AddCommand(newInfoCommand(nil))
@@ -88,7 +88,7 @@ func (o *options) resolve(args []string) error {
 	}
 
 	if o.ConfigPath == "" {
-		o.ConfigPath = os.Getenv("MCJAVA_MANAGER_CONFIG")
+		o.ConfigPath = os.Getenv("MODINK_CONFIG")
 	}
 
 	var err error
@@ -109,7 +109,7 @@ func (o *options) instancePath() (string, error) {
 
 	path := o.InstancePath
 	if path == "" {
-		path = os.Getenv("MCJAVA_MANAGER_INSTANCE")
+		path = os.Getenv("MODINK_INSTANCE")
 	}
 
 	absolute, err := absolutePath(path)
@@ -126,7 +126,7 @@ func (o *options) resolveInstance() (string, error) {
 		return "", err
 	}
 	if path == "" {
-		return "", fmt.Errorf("informe o caminho da instância com --instance ou defina MCJAVA_MANAGER_INSTANCE")
+		return "", fmt.Errorf("informe o caminho da instância com --instance ou defina MODINK_INSTANCE")
 	}
 
 	return path, nil

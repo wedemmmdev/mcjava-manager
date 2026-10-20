@@ -15,9 +15,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/wedemmmdev/mcjava-manager/internal/instance"
-	"github.com/wedemmmdev/mcjava-manager/internal/netdns"
-	"github.com/wedemmmdev/mcjava-manager/pkg/modsource"
+	"github.com/wedemmmdev/modink/internal/instance"
+	"github.com/wedemmmdev/modink/internal/netdns"
+	"github.com/wedemmmdev/modink/pkg/modsource"
 )
 
 const (
@@ -29,9 +29,9 @@ const (
 	DefaultMaxBytes int64 = 1 << 30 // 1 GiB
 
 	// DefaultUserAgent identifies this application to download servers.
-	DefaultUserAgent = "mcjava-manager/dev (https://github.com/wedemmmdev/mcjava-manager)"
+	DefaultUserAgent = "modink/dev (https://github.com/wedemmmdev/modink)"
 
-	tempPattern    = ".mcjava-manager-*.part"
+	tempPattern    = ".modink-*.part"
 	copyBufferSize = 32 * 1024
 )
 

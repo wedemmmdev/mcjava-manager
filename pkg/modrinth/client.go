@@ -13,8 +13,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/wedemmmdev/mcjava-manager/internal/netdns"
-	"github.com/wedemmmdev/mcjava-manager/pkg/modsource"
+	"github.com/wedemmmdev/modink/internal/netdns"
+	"github.com/wedemmmdev/modink/pkg/modsource"
 )
 
 const (
@@ -22,7 +22,7 @@ const (
 	DefaultBaseURL = "https://api.modrinth.com/v2"
 
 	// DefaultUserAgent identifies this application to Modrinth.
-	DefaultUserAgent = "mcjava-manager/dev (https://github.com/wedemmmdev/mcjava-manager)"
+	DefaultUserAgent = "modink/dev (https://github.com/wedemmmdev/modink)"
 
 	// DefaultTimeout is applied when the caller does not provide an HTTP
 	// client with a timeout.

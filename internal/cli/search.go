@@ -8,8 +8,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/wedemmmdev/mcjava-manager/pkg/modrinth"
-	"github.com/wedemmmdev/mcjava-manager/pkg/modsource"
+	"github.com/wedemmmdev/modink/pkg/modrinth"
+	"github.com/wedemmmdev/modink/pkg/modsource"
 )
 
 type searchOptions struct {
@@ -38,10 +38,10 @@ func newSearchCommand(client modsource.Client) *cobra.Command {
 O Modrinth é usado por padrão. Combine --type, --loader, --game-version e
 --category para refinar os resultados. Sem um termo, a busca lista projetos
 em destaque para os filtros informados.`,
-		Example: `  mcjava-manager search sodium
-  mcjava-manager search --type shader --game-version 1.20.1
-  mcjava-manager search "resource pack" --category vanilla-like --limit 10
-  mcjava-manager search sodium --loader fabric --sort downloads`,
+		Example: `  modink search sodium
+  modink search --type shader --game-version 1.20.1
+  modink search "resource pack" --category vanilla-like --limit 10
+  modink search sodium --loader fabric --sort downloads`,
 		Args:          cobra.MaximumNArgs(1),
 		SilenceErrors: true,
 		SilenceUsage:  true,

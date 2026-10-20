@@ -1,4 +1,4 @@
-module github.com/wedemmmdev/mcjava-manager
+module github.com/wedemmmdev/modink
 
 go 1.24.2
 

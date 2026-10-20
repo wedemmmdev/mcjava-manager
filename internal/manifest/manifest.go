@@ -1,9 +1,9 @@
 // Package manifest persists the content installed in a Minecraft instance.
 //
 // The manifest lives inside the instance at
-// .mcjava-manager/installed.json. It records the provider, project, version,
+// .modink/installed.json. It records the provider, project, version,
 // selected compatibility filters, and target file for every artifact managed
-// by mcjava-manager. Existing files that are not present in the manifest are
+// by Modink. Existing files that are not present in the manifest are
 // deliberately left untouched.
 package manifest
 
@@ -20,14 +20,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/wedemmmdev/mcjava-manager/internal/download"
-	"github.com/wedemmmdev/mcjava-manager/internal/instance"
-	"github.com/wedemmmdev/mcjava-manager/pkg/modsource"
+	"github.com/wedemmmdev/modink/internal/download"
+	"github.com/wedemmmdev/modink/internal/instance"
+	"github.com/wedemmmdev/modink/pkg/modsource"
 )
 
 const (
 	// StateDirName is the hidden directory that stores manager metadata.
-	StateDirName = ".mcjava-manager"
+	StateDirName = ".modink"
 
 	// FileName is the manifest file name inside StateDirName.
 	FileName = "installed.json"

@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/wedemmmdev/mcjava-manager/pkg/modsource"
+	"github.com/wedemmmdev/modink/pkg/modsource"
 )
 
 var loaderCategories = map[string]struct{}{

@@ -7,7 +7,7 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/lipgloss"
 
-	"github.com/wedemmmdev/mcjava-manager/pkg/modsource"
+	"github.com/wedemmmdev/modink/pkg/modsource"
 )
 
 var (
@@ -114,7 +114,7 @@ func (m tuiModel) headerView() string {
 	if m.inst != nil {
 		path = m.inst.Path
 	}
-	title := tuiTitleStyle.Render("mcjava-manager")
+	title := tuiTitleStyle.Render("Modink")
 	pathView := ""
 	if maxPath := m.width - 20; maxPath >= 8 {
 		path = truncateMiddle(sanitizeText(path), maxPath)

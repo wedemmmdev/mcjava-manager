@@ -3,7 +3,7 @@ package cli
 import (
 	"context"
 
-	"github.com/wedemmmdev/mcjava-manager/pkg/modsource"
+	"github.com/wedemmmdev/modink/pkg/modsource"
 )
 
 type fakeProviderClient struct {

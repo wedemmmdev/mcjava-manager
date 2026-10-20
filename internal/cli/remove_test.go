@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/wedemmmdev/mcjava-manager/pkg/modsource"
+	"github.com/wedemmmdev/modink/pkg/modsource"
 )
 
 func executeRemoveCommand(t *testing.T, globalOpts *options, args ...string) (string, string, error) {

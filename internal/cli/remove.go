@@ -12,10 +12,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/wedemmmdev/mcjava-manager/internal/download"
-	"github.com/wedemmmdev/mcjava-manager/internal/instance"
-	"github.com/wedemmmdev/mcjava-manager/internal/manifest"
-	"github.com/wedemmmdev/mcjava-manager/pkg/modsource"
+	"github.com/wedemmmdev/modink/internal/download"
+	"github.com/wedemmmdev/modink/internal/instance"
+	"github.com/wedemmmdev/modink/internal/manifest"
+	"github.com/wedemmmdev/modink/pkg/modsource"
 )
 
 type removeOptions struct {
@@ -50,9 +50,9 @@ também podem ser removidos pelo nome ou caminho.
 
 A remoção é explícita e não pede confirmação adicional. Use --type para
 desambiguar quando o mesmo nome existir em pastas diferentes.`,
-		Example: `  mcjava-manager remove sodium --instance ./minha-instancia
-  mcjava-manager remove mods/sodium.jar --instance ./minha-instancia
-  mcjava-manager remove sodium.jar --instance ./minha-instancia --type mod`,
+		Example: `  modink remove sodium --instance ./minha-instancia
+  modink remove mods/sodium.jar --instance ./minha-instancia
+  modink remove sodium.jar --instance ./minha-instancia --type mod`,
 		Args:          cobra.ExactArgs(1),
 		SilenceErrors: true,
 		SilenceUsage:  true,

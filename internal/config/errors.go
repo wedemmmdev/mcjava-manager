@@ -3,7 +3,7 @@ package config
 import (
 	"fmt"
 
-	"github.com/wedemmmdev/mcjava-manager/pkg/modsource"
+	"github.com/wedemmmdev/modink/pkg/modsource"
 )
 
 // MissingAPIKeyError explains how to configure a required API key. It unwraps

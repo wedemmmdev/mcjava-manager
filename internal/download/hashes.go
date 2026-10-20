@@ -8,7 +8,7 @@ import (
 	"hash"
 	"strings"
 
-	"github.com/wedemmmdev/mcjava-manager/pkg/modsource"
+	"github.com/wedemmmdev/modink/pkg/modsource"
 )
 
 type hashSpec struct {

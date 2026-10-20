@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/wedemmmdev/mcjava-manager/pkg/modsource"
+	"github.com/wedemmmdev/modink/pkg/modsource"
 )
 
 const searchResponseJSON = `{
@@ -144,8 +144,8 @@ func assertJSONRequest(t *testing.T, r *http.Request, method, path string) {
 	if got := r.Header.Get("Accept"); got != "application/json" {
 		t.Errorf("Accept = %q, esperado application/json", got)
 	}
-	if got := r.Header.Get("User-Agent"); !strings.Contains(got, "mcjava-manager") {
-		t.Errorf("User-Agent = %q, esperado identificação do mcjava-manager", got)
+	if got := r.Header.Get("User-Agent"); !strings.Contains(got, "modink") {
+		t.Errorf("User-Agent = %q, esperado identificação do Modink", got)
 	}
 }
 

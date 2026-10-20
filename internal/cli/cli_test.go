@@ -10,8 +10,8 @@ import (
 )
 
 func TestAppRunsVersionCommand(t *testing.T) {
-	t.Setenv("MCJAVA_MANAGER_INSTANCE", "")
-	t.Setenv("MCJAVA_MANAGER_CONFIG", "")
+	t.Setenv("MODINK_INSTANCE", "")
+	t.Setenv("MODINK_CONFIG", "")
 
 	var out, errOut bytes.Buffer
 	app := NewApp(strings.NewReader(""), &out, &errOut)
@@ -19,8 +19,8 @@ func TestAppRunsVersionCommand(t *testing.T) {
 	if err := app.Execute(context.Background(), []string{"version"}); err != nil {
 		t.Fatalf("Execute() error = %v", err)
 	}
-	if !strings.Contains(out.String(), "mcjava-manager") {
-		t.Fatalf("version output = %q, want it to contain mcjava-manager", out.String())
+	if !strings.Contains(out.String(), "Modink") {
+		t.Fatalf("version output = %q, want it to contain Modink", out.String())
 	}
 	if errOut.Len() != 0 {
 		t.Fatalf("stderr = %q, want empty", errOut.String())
@@ -28,8 +28,8 @@ func TestAppRunsVersionCommand(t *testing.T) {
 }
 
 func TestAppShowsHelpWithoutInstance(t *testing.T) {
-	t.Setenv("MCJAVA_MANAGER_INSTANCE", "")
-	t.Setenv("MCJAVA_MANAGER_CONFIG", "")
+	t.Setenv("MODINK_INSTANCE", "")
+	t.Setenv("MODINK_CONFIG", "")
 
 	var out, errOut bytes.Buffer
 	app := NewApp(strings.NewReader(""), &out, &errOut)
@@ -54,14 +54,14 @@ func TestAppVersionFlag(t *testing.T) {
 	if err := app.Execute(context.Background(), []string{"--version"}); err != nil {
 		t.Fatalf("Execute() error = %v", err)
 	}
-	if !strings.Contains(out.String(), "mcjava-manager") {
+	if !strings.Contains(out.String(), "Modink") {
 		t.Fatalf("--version output = %q", out.String())
 	}
 }
 
 func TestOptionsResolvePositionalInstance(t *testing.T) {
-	t.Setenv("MCJAVA_MANAGER_INSTANCE", "")
-	t.Setenv("MCJAVA_MANAGER_CONFIG", "")
+	t.Setenv("MODINK_INSTANCE", "")
+	t.Setenv("MODINK_CONFIG", "")
 
 	opts := &options{}
 	if err := opts.resolve([]string{"./minha-instancia"}); err != nil {
@@ -76,8 +76,8 @@ func TestOptionsResolvePositionalInstance(t *testing.T) {
 }
 
 func TestOptionsResolveRejectsConflictingInstances(t *testing.T) {
-	t.Setenv("MCJAVA_MANAGER_INSTANCE", "")
-	t.Setenv("MCJAVA_MANAGER_CONFIG", "")
+	t.Setenv("MODINK_INSTANCE", "")
+	t.Setenv("MODINK_CONFIG", "")
 
 	opts := &options{InstancePath: "./primeira"}
 	if err := opts.resolve([]string{"./segunda"}); err == nil {
@@ -86,8 +86,8 @@ func TestOptionsResolveRejectsConflictingInstances(t *testing.T) {
 }
 
 func TestOptionsResolveAcceptsRepeatedInstance(t *testing.T) {
-	t.Setenv("MCJAVA_MANAGER_INSTANCE", "")
-	t.Setenv("MCJAVA_MANAGER_CONFIG", "")
+	t.Setenv("MODINK_INSTANCE", "")
+	t.Setenv("MODINK_CONFIG", "")
 
 	opts := &options{InstancePath: "./mesma"}
 	if err := opts.resolve([]string{"./mesma"}); err != nil {
@@ -96,8 +96,8 @@ func TestOptionsResolveAcceptsRepeatedInstance(t *testing.T) {
 }
 
 func TestOptionsResolveDoesNotValidateLoaderNames(t *testing.T) {
-	t.Setenv("MCJAVA_MANAGER_INSTANCE", "")
-	t.Setenv("MCJAVA_MANAGER_CONFIG", "")
+	t.Setenv("MODINK_INSTANCE", "")
+	t.Setenv("MODINK_CONFIG", "")
 
 	names := []string{
 		"minha-instancia",
@@ -120,8 +120,8 @@ func TestOptionsResolveDoesNotValidateLoaderNames(t *testing.T) {
 }
 
 func TestOptionsResolveEnvironment(t *testing.T) {
-	t.Setenv("MCJAVA_MANAGER_INSTANCE", "./instancia-do-ambiente")
-	t.Setenv("MCJAVA_MANAGER_CONFIG", "./config-do-ambiente.yaml")
+	t.Setenv("MODINK_INSTANCE", "./instancia-do-ambiente")
+	t.Setenv("MODINK_CONFIG", "./config-do-ambiente.yaml")
 
 	opts := &options{}
 	if err := opts.resolve(nil); err != nil {
@@ -136,8 +136,8 @@ func TestOptionsResolveEnvironment(t *testing.T) {
 }
 
 func TestOptionsResolveFlagOverridesEnvironment(t *testing.T) {
-	t.Setenv("MCJAVA_MANAGER_INSTANCE", "./ambiente")
-	t.Setenv("MCJAVA_MANAGER_CONFIG", "")
+	t.Setenv("MODINK_INSTANCE", "./ambiente")
+	t.Setenv("MODINK_CONFIG", "")
 
 	opts := &options{InstancePath: "./flag"}
 	if err := opts.resolve(nil); err != nil {
@@ -189,7 +189,7 @@ func TestExpandHome(t *testing.T) {
 }
 
 func TestOptionsResolveInstanceUsesFlag(t *testing.T) {
-	t.Setenv("MCJAVA_MANAGER_INSTANCE", "./ambiente")
+	t.Setenv("MODINK_INSTANCE", "./ambiente")
 
 	opts := &options{InstancePath: "./flag"}
 	got, err := opts.resolveInstance()
@@ -202,7 +202,7 @@ func TestOptionsResolveInstanceUsesFlag(t *testing.T) {
 }
 
 func TestOptionsResolveInstanceUsesEnvironment(t *testing.T) {
-	t.Setenv("MCJAVA_MANAGER_INSTANCE", "./ambiente")
+	t.Setenv("MODINK_INSTANCE", "./ambiente")
 
 	got, err := (&options{}).resolveInstance()
 	if err != nil {
@@ -214,7 +214,7 @@ func TestOptionsResolveInstanceUsesEnvironment(t *testing.T) {
 }
 
 func TestOptionsResolveInstanceRequiresPath(t *testing.T) {
-	t.Setenv("MCJAVA_MANAGER_INSTANCE", "")
+	t.Setenv("MODINK_INSTANCE", "")
 
 	_, err := (&options{}).resolveInstance()
 	if err == nil || !strings.Contains(err.Error(), "informe o caminho da instância") {

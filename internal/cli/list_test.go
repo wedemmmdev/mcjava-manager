@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/wedemmmdev/mcjava-manager/internal/manifest"
-	"github.com/wedemmmdev/mcjava-manager/pkg/modsource"
+	"github.com/wedemmmdev/modink/internal/manifest"
+	"github.com/wedemmmdev/modink/pkg/modsource"
 )
 
 func executeListCommand(t *testing.T, globalOpts *options, args ...string) (string, string, error) {

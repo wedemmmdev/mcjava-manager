@@ -20,7 +20,7 @@ import (
 
 const (
 	// FileName is the default local configuration file name.
-	FileName = ".mcjava-manager.yaml"
+	FileName = ".modink.yaml"
 
 	// EnvCurseForgeAPIKey is the environment variable checked before the
 	// configuration file when resolving CurseForge credentials.
@@ -29,7 +29,7 @@ const (
 	maxConfigSize = 1 << 20 // 1 MiB
 )
 
-// Config is the local configuration loaded from .mcjava-manager.yaml.
+// Config is the local configuration loaded from .modink.yaml.
 type Config struct {
 	CurseForge CurseForgeConfig `yaml:"curseforge"`
 

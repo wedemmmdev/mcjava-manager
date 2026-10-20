@@ -15,9 +15,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/wedemmmdev/mcjava-manager/internal/download"
-	"github.com/wedemmmdev/mcjava-manager/internal/instance"
-	"github.com/wedemmmdev/mcjava-manager/pkg/modsource"
+	"github.com/wedemmmdev/modink/internal/download"
+	"github.com/wedemmmdev/modink/internal/instance"
+	"github.com/wedemmmdev/modink/pkg/modsource"
 )
 
 func installHashes(content []byte) []modsource.Hash {
@@ -45,7 +45,7 @@ func executeInstallCommand(
 func installTestDownloader(server *httptest.Server) *download.Client {
 	return download.New(
 		download.WithHTTPClient(server.Client()),
-		download.WithUserAgent("mcjava-manager/test"),
+		download.WithUserAgent("modink/test"),
 	)
 }
 
@@ -60,7 +60,7 @@ func assertNoInstallTempFiles(t *testing.T, directory string) {
 		t.Fatalf("ReadDir() error = %v", err)
 	}
 	for _, entry := range entries {
-		if strings.HasPrefix(entry.Name(), ".mcjava-manager-") {
+		if strings.HasPrefix(entry.Name(), ".modink-") {
 			t.Fatalf("temporary file %q was not removed", entry.Name())
 		}
 	}
@@ -69,7 +69,7 @@ func assertNoInstallTempFiles(t *testing.T, directory string) {
 func TestInstallCommandInstallsLatestCompatibleVersion(t *testing.T) {
 	content := []byte("conteúdo do sodium")
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if got := r.Header.Get("User-Agent"); got != "mcjava-manager/test" {
+		if got := r.Header.Get("User-Agent"); got != "modink/test" {
 			t.Errorf("User-Agent = %q", got)
 		}
 		_, _ = w.Write(content)
@@ -555,7 +555,7 @@ func TestInstallCommandNoCompatibleVersion(t *testing.T) {
 }
 
 func TestInstallCommandRequiresInstance(t *testing.T) {
-	t.Setenv("MCJAVA_MANAGER_INSTANCE", "")
+	t.Setenv("MODINK_INSTANCE", "")
 
 	client := &fakeProviderClient{}
 	_, _, err := executeInstallCommand(t, client, &options{}, download.New(), "sodium")
@@ -575,7 +575,7 @@ func TestInstallCommandUsesInstanceEnvironment(t *testing.T) {
 	t.Cleanup(server.Close)
 
 	instancePath := t.TempDir()
-	t.Setenv("MCJAVA_MANAGER_INSTANCE", instancePath)
+	t.Setenv("MODINK_INSTANCE", instancePath)
 
 	client := &fakeProviderClient{
 		project: modsource.Project{ID: "P1", Name: "Sodium", Type: modsource.KindMod},

@@ -5,9 +5,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/wedemmmdev/mcjava-manager/internal/instance"
-	"github.com/wedemmmdev/mcjava-manager/internal/manifest"
-	"github.com/wedemmmdev/mcjava-manager/pkg/modsource"
+	"github.com/wedemmmdev/modink/internal/instance"
+	"github.com/wedemmmdev/modink/internal/manifest"
+	"github.com/wedemmmdev/modink/pkg/modsource"
 )
 
 var tuiSearchKindLabels = []string{
@@ -306,7 +306,7 @@ func tuiInstalledDetails(inst *instance.Instance, item tuiInstalledItem) string 
 	fmt.Fprintf(&builder, "Tipo: %s\n", displayProjectType(file.kind))
 	fmt.Fprintf(&builder, "Status: arquivo não rastreado\n")
 	fmt.Fprintf(&builder, "Tamanho: %s\n", formatBytes(file.size))
-	fmt.Fprintf(&builder, "\nEste arquivo está na pasta gerenciada, mas não foi instalado pelo mcjava-manager.\n")
+	fmt.Fprintf(&builder, "\nEste arquivo está na pasta gerenciada, mas não foi instalado pelo Modink.\n")
 
 	return strings.TrimRight(builder.String(), "\n")
 }

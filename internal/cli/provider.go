@@ -3,9 +3,9 @@ package cli
 import (
 	"fmt"
 
-	"github.com/wedemmmdev/mcjava-manager/internal/version"
-	"github.com/wedemmmdev/mcjava-manager/pkg/modrinth"
-	"github.com/wedemmmdev/mcjava-manager/pkg/modsource"
+	"github.com/wedemmmdev/modink/internal/version"
+	"github.com/wedemmmdev/modink/pkg/modrinth"
+	"github.com/wedemmmdev/modink/pkg/modsource"
 )
 
 func resolveProviderClient(client modsource.Client, providerName string) (modsource.Client, error) {
@@ -36,5 +36,5 @@ func newProviderClient(provider modsource.Provider) (modsource.Client, error) {
 }
 
 func providerUserAgent() string {
-	return fmt.Sprintf("mcjava-manager/%s (https://github.com/wedemmmdev/mcjava-manager)", version.Short())
+	return fmt.Sprintf("modink/%s (https://github.com/wedemmmdev/modink)", version.Short())
 }

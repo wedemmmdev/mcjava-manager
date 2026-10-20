@@ -1,4 +1,4 @@
-// Command mcjava-manager is a standalone CLI for managing content in Minecraft
+// Command modink is a standalone CLI for managing content in Minecraft
 // Java instances, including mods, shader packs, resource packs, and worlds.
 package main
 
@@ -9,7 +9,7 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/wedemmmdev/mcjava-manager/internal/cli"
+	"github.com/wedemmmdev/modink/internal/cli"
 )
 
 func main() {

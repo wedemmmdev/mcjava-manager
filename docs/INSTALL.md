@@ -1,6 +1,6 @@
 # Instalação
 
-Este guia cobre a instalação do `mcjava-manager` em Linux, macOS, Windows, WSL e Termux/Android, além de compilação cruzada e solução de problemas.
+Este guia cobre a instalação do **Modink** em Linux, macOS, Windows, WSL e Termux/Android, além de compilação cruzada e solução de problemas.
 
 ## Requisitos
 
@@ -29,7 +29,7 @@ go version
 Esta é a forma mais simples de obter o binário mais recente:
 
 ```bash
-go install github.com/wedemmmdev/mcjava-manager/cmd/mcjava-manager@latest
+go install github.com/wedemmmdev/modink/cmd/modink@latest
 ```
 
 O Go instala o executável em `$(go env GOPATH)/bin` (ou em `GOBIN`, se essa variável estiver definida):
@@ -38,14 +38,14 @@ O Go instala o executável em `$(go env GOPATH)/bin` (ou em `GOBIN`, se essa var
 go env GOPATH
 ```
 
-Normalmente o caminho é `~/go/bin` em Linux/macOS e `%USERPROFILE%\go\bin` no Windows. Adicione essa pasta ao `PATH` se o comando `mcjava-manager` não for encontrado.
+Normalmente o caminho é `~/go/bin` em Linux/macOS e `%USERPROFILE%\go\bin` no Windows. Adicione essa pasta ao `PATH` se o comando `modink` não for encontrado.
 
 ### Compilar a partir do código-fonte
 
 ```bash
-git clone https://github.com/wedemmmdev/mcjava-manager.git
-cd mcjava-manager
-CGO_ENABLED=0 go build -buildvcs=false -trimpath -ldflags="-s -w" -o mcjava-manager ./cmd/mcjava-manager
+git clone https://github.com/wedemmmdev/modink.git
+cd modink
+CGO_ENABLED=0 go build -buildvcs=false -trimpath -ldflags="-s -w" -o modink ./cmd/modink
 ```
 
 Com `CGO_ENABLED=0`, o resultado não depende de bibliotecas C externas e é adequado para distribuição como binário único.
@@ -54,8 +54,8 @@ Para builds de desenvolvimento com metadados de versão:
 
 ```bash
 CGO_ENABLED=0 go build -buildvcs=false -trimpath -ldflags="-s -w \
-  -X github.com/wedemmmdev/mcjava-manager/internal/version.Version=dev" \
-  -o mcjava-manager ./cmd/mcjava-manager
+  -X github.com/wedemmmdev/modink/internal/version.Version=dev" \
+  -o modink ./cmd/modink
 ```
 
 ### Releases binárias
@@ -69,7 +69,7 @@ O repositório ainda não publica releases binárias oficiais. Até que isso exi
 ```bash
 mkdir -p "$HOME/.local/bin"
 CGO_ENABLED=0 go build -buildvcs=false -trimpath -ldflags="-s -w" \
-  -o "$HOME/.local/bin/mcjava-manager" ./cmd/mcjava-manager
+  -o "$HOME/.local/bin/modink" ./cmd/modink
 ```
 
 Adicione `~/.local/bin` ao `PATH` caso ainda não esteja:
@@ -94,14 +94,14 @@ fish_add_path "$HOME/.local/bin"
 ### Instalar em `/usr/local/bin`
 
 ```bash
-sudo install -m 0755 mcjava-manager /usr/local/bin/mcjava-manager
+sudo install -m 0755 modink /usr/local/bin/modink
 ```
 
 ### Verificar se o binário é estático
 
 ```bash
-file mcjava-manager
-ldd mcjava-manager
+file modink
+ldd modink
 ```
 
 Em um build estático, `file` mostra `statically linked` e `ldd` informa que o binário não é um executável dinâmico.
@@ -111,7 +111,7 @@ Em um build estático, `file` mostra `statically linked` e `ldd` informa que o b
 Para Raspberry Pi e outros sistemas ARM, compile na própria máquina:
 
 ```bash
-CGO_ENABLED=0 go build -buildvcs=false -trimpath -ldflags="-s -w" -o mcjava-manager ./cmd/mcjava-manager
+CGO_ENABLED=0 go build -buildvcs=false -trimpath -ldflags="-s -w" -o modink ./cmd/modink
 ```
 
 Ou faça compilação cruzada com `GOARCH=arm64` ou `GOARCH=arm`.
@@ -121,7 +121,7 @@ Ou faça compilação cruzada com `GOARCH=arm64` ou `GOARCH=arm`.
 ### Instalar com Go
 
 ```bash
-go install github.com/wedemmmdev/mcjava-manager/cmd/mcjava-manager@latest
+go install github.com/wedemmmdev/modink/cmd/modink@latest
 ```
 
 Adicione `$HOME/go/bin` ao `PATH` se necessário:
@@ -134,9 +134,9 @@ source ~/.zshrc
 ### Compilar localmente
 
 ```bash
-git clone https://github.com/wedemmmdev/mcjava-manager.git
-cd mcjava-manager
-CGO_ENABLED=0 go build -buildvcs=false -trimpath -ldflags="-s -w" -o mcjava-manager ./cmd/mcjava-manager
+git clone https://github.com/wedemmmdev/modink.git
+cd modink
+CGO_ENABLED=0 go build -buildvcs=false -trimpath -ldflags="-s -w" -o modink ./cmd/modink
 ```
 
 Em Macs com Apple Silicon, o build nativo gera `arm64`. Para um Mac Intel, use `GOARCH=amd64` se estiver compilando em outra máquina.
@@ -146,8 +146,8 @@ Em Macs com Apple Silicon, o build nativo gera `arm64`. Para um Mac Intel, use `
 Se você baixar um binário pronto e o macOS bloquear a execução, remova o atributo de quarentena depois de confirmar a origem do arquivo:
 
 ```bash
-chmod +x mcjava-manager
-xattr -d com.apple.quarantine mcjava-manager
+chmod +x modink
+xattr -d com.apple.quarantine modink
 ```
 
 Também é possível liberar pelo diálogo **Ajustes do Sistema > Privacidade e Segurança**.
@@ -163,7 +163,7 @@ Se o macOS negar acesso à pasta da instância, verifique **Ajustes do Sistema >
 No PowerShell:
 
 ```powershell
-go install github.com/wedemmmdev/mcjava-manager/cmd/mcjava-manager@latest
+go install github.com/wedemmmdev/modink/cmd/modink@latest
 ```
 
 Adicione `%USERPROFILE%\go\bin` ao `PATH` do usuário. Em uma sessão atual do PowerShell:
@@ -177,25 +177,25 @@ Para tornar a alteração permanente, use a interface de **Variáveis de Ambient
 ### Compilar localmente
 
 ```powershell
-git clone https://github.com/wedemmmdev/mcjava-manager.git
-cd mcjava-manager
+git clone https://github.com/wedemmmdev/modink.git
+cd modink
 $env:CGO_ENABLED = "0"
-go build -buildvcs=false -trimpath -ldflags="-s -w" -o mcjava-manager.exe .\cmd\mcjava-manager
+go build -buildvcs=false -trimpath -ldflags="-s -w" -o modink.exe .\cmd\modink
 ```
 
 Execute no PowerShell, no Prompt de Comando ou no Windows Terminal:
 
 ```powershell
-.\mcjava-manager.exe --help
-.\mcjava-manager.exe --instance "C:\Users\SeuUsuario\AppData\Roaming\PrismLauncher\instances\MinhaInstancia\minecraft"
+.\modink.exe --help
+.\modink.exe --instance "C:\Users\SeuUsuario\AppData\Roaming\PrismLauncher\instances\MinhaInstancia\minecraft"
 ```
 
 ### PATH e pastas com espaços
 
-Coloque o `.exe` em uma pasta como `C:\Tools\mcjava-manager` e adicione essa pasta ao `PATH`. Sempre use aspas quando o caminho da instância tiver espaços:
+Coloque o `.exe` em uma pasta como `C:\Tools\modink` e adicione essa pasta ao `PATH`. Sempre use aspas quando o caminho da instância tiver espaços:
 
 ```powershell
-mcjava-manager --instance "D:\Jogos\Minecraft\Instâncias\Fabric 1.21"
+modink --instance "D:\Jogos\Minecraft\Instâncias\Fabric 1.21"
 ```
 
 ### Antivírus e Proteção contra Ransomware
@@ -215,13 +215,13 @@ No WSL, use o binário Linux. Instale o Go dentro da distribuição ou compile e
 
 ```bash
 CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
-  go build -buildvcs=false -trimpath -ldflags="-s -w" -o mcjava-manager ./cmd/mcjava-manager
+  go build -buildvcs=false -trimpath -ldflags="-s -w" -o modink ./cmd/modink
 ```
 
 Instâncias que ficam no Windows podem ser acessadas por `/mnt/c/...`:
 
 ```bash
-mcjava-manager --instance "/mnt/c/Users/SeuUsuario/AppData/Roaming/PrismLauncher/instances/MinhaInstancia/minecraft"
+modink --instance "/mnt/c/Users/SeuUsuario/AppData/Roaming/PrismLauncher/instances/MinhaInstancia/minecraft"
 ```
 
 O acesso a `/mnt/c` é mais lento que ao sistema de arquivos do WSL, mas funciona. Se possível, mantenha a instância no sistema de arquivos Linux para melhor desempenho.
@@ -238,18 +238,18 @@ pkg install golang git
 ### Compilar e instalar
 
 ```bash
-git clone https://github.com/wedemmmdev/mcjava-manager.git
-cd mcjava-manager
-CGO_ENABLED=0 go build -buildvcs=false -trimpath -ldflags="-s -w" -o mcjava-manager ./cmd/mcjava-manager
+git clone https://github.com/wedemmmdev/modink.git
+cd modink
+CGO_ENABLED=0 go build -buildvcs=false -trimpath -ldflags="-s -w" -o modink ./cmd/modink
 mkdir -p "$PREFIX/bin"
-mv mcjava-manager "$PREFIX/bin/mcjava-manager"
-chmod +x "$PREFIX/bin/mcjava-manager"
+mv modink "$PREFIX/bin/modink"
+chmod +x "$PREFIX/bin/modink"
 ```
 
 Verifique:
 
 ```bash
-mcjava-manager version
+modink version
 ```
 
 ### Acesso ao armazenamento
@@ -263,7 +263,7 @@ termux-setup-storage
 Depois use um caminho acessível, como:
 
 ```bash
-mcjava-manager --instance "$HOME/storage/shared/.../minha-instancia"
+modink --instance "$HOME/storage/shared/.../minha-instancia"
 ```
 
 O Android pode restringir o acesso a `Android/data` e `Android/obb` em versões recentes. Se a instância estiver nessas pastas, mova-a para uma área compartilhada permitida ou use um gerenciador de arquivos com acesso autorizado.
@@ -277,8 +277,8 @@ Se aparecer `permissão negada`, confirme que:
 3. o usuário do Termux consegue criar um arquivo de teste na pasta:
 
 ```bash
-touch "$HOME/storage/shared/teste-mcjava-manager"
-rm "$HOME/storage/shared/teste-mcjava-manager"
+touch "$HOME/storage/shared/teste-modink"
+rm "$HOME/storage/shared/teste-modink"
 ```
 
 ### Execução via Shizuku (rish) para instâncias restritas
@@ -295,32 +295,32 @@ Os clientes HTTP do binário usam resolvedores públicos (`8.8.8.8:53` e `1.1.1.
 1. Copie o binário do Termux para uma pasta pública:
 
    ```bash
-   cp "$PREFIX/bin/mcjava-manager" /sdcard/Download/
+   cp "$PREFIX/bin/modink" /sdcard/Download/
    ```
 
 2. Use o Shizuku para mover o binário para o diretório executável do Android:
 
    ```bash
-   rish -c "cp /sdcard/Download/mcjava-manager /data/local/tmp/"
+   rish -c "cp /sdcard/Download/modink /data/local/tmp/"
    ```
 
 3. Dê permissão de execução nativa via Shizuku:
 
    ```bash
-   rish -c "chmod +x /data/local/tmp/mcjava-manager"
+   rish -c "chmod +x /data/local/tmp/modink"
    ```
 
 4. Para comandos CLI, execute o programa pelo Shizuku passando o caminho absoluto da instância:
 
    ```bash
-   rish -c "/data/local/tmp/mcjava-manager --instance /sdcard/Android/data/nome.do.seu.launcher/files/sua_instancia list"
+   rish -c "/data/local/tmp/modink --instance /sdcard/Android/data/nome.do.seu.launcher/files/sua_instancia list"
    ```
 
 5. Para abrir a TUI, entre no shell interativo do Shizuku. O `rish -c` não encaminha a entrada do terminal, então a TUI não recebe teclas:
 
    ```bash
    rish
-   /data/local/tmp/mcjava-manager --instance /sdcard/Android/data/nome.do.seu.launcher/files/sua_instancia
+   /data/local/tmp/modink --instance /sdcard/Android/data/nome.do.seu.launcher/files/sua_instancia
    ```
 
    A TUI força True Color (24-bit), independentemente de `TERM`, `COLORTERM` ou do ambiente do `rish`. Use `--no-color` para desativar as cores.
@@ -338,40 +338,40 @@ mkdir -p dist
 ```bash
 # Linux x86_64
 CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
-  go build -buildvcs=false -trimpath -ldflags="-s -w" -o dist/mcjava-manager-linux-amd64 ./cmd/mcjava-manager
+  go build -buildvcs=false -trimpath -ldflags="-s -w" -o dist/modink-linux-amd64 ./cmd/modink
 
 # Linux ARM64
 CGO_ENABLED=0 GOOS=linux GOARCH=arm64 \
-  go build -buildvcs=false -trimpath -ldflags="-s -w" -o dist/mcjava-manager-linux-arm64 ./cmd/mcjava-manager
+  go build -buildvcs=false -trimpath -ldflags="-s -w" -o dist/modink-linux-arm64 ./cmd/modink
 
 # Linux ARMv7
 CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=7 \
-  go build -buildvcs=false -trimpath -ldflags="-s -w" -o dist/mcjava-manager-linux-armv7 ./cmd/mcjava-manager
+  go build -buildvcs=false -trimpath -ldflags="-s -w" -o dist/modink-linux-armv7 ./cmd/modink
 
 # macOS Intel
 CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 \
-  go build -buildvcs=false -trimpath -ldflags="-s -w" -o dist/mcjava-manager-darwin-amd64 ./cmd/mcjava-manager
+  go build -buildvcs=false -trimpath -ldflags="-s -w" -o dist/modink-darwin-amd64 ./cmd/modink
 
 # macOS Apple Silicon
 CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 \
-  go build -buildvcs=false -trimpath -ldflags="-s -w" -o dist/mcjava-manager-darwin-arm64 ./cmd/mcjava-manager
+  go build -buildvcs=false -trimpath -ldflags="-s -w" -o dist/modink-darwin-arm64 ./cmd/modink
 
 # Windows x86_64
 CGO_ENABLED=0 GOOS=windows GOARCH=amd64 \
-  go build -buildvcs=false -trimpath -ldflags="-s -w" -o dist/mcjava-manager-windows-amd64.exe ./cmd/mcjava-manager
+  go build -buildvcs=false -trimpath -ldflags="-s -w" -o dist/modink-windows-amd64.exe ./cmd/modink
 ```
 
 ## Verificação pós-instalação
 
 ```bash
-mcjava-manager version
-mcjava-manager --help
+modink version
+modink --help
 ```
 
 Saída esperada do `version` (os valores variam conforme o build):
 
 ```text
-mcjava-manager dev (commit none, build unknown, go1.24.2)
+Modink dev (commit none, build unknown, go1.24.2)
 ```
 
 Em um build com metadados injetados, a versão e o commit aparecem preenchidos.
@@ -382,7 +382,7 @@ Em um build com metadados injetados, a versão e o commit aparecem preenchidos.
 2. Informe o caminho da instância:
 
    ```bash
-   mcjava-manager --instance /caminho/da/instancia
+   modink --instance /caminho/da/instancia
    ```
 
 3. A TUI cria `mods/`, `shaderpacks/`, `resourcepacks/` e `saves/` se ainda não existirem.
@@ -392,9 +392,9 @@ Em um build com metadados injetados, a versão e o commit aparecem preenchidos.
 Também é possível começar pela CLI:
 
 ```bash
-mcjava-manager search sodium --game-version 1.21.1 --loader fabric
-mcjava-manager install sodium --instance /caminho/da/instancia --game-version 1.21.1 --loader fabric
-mcjava-manager list --instance /caminho/da/instancia
+modink search sodium --game-version 1.21.1 --loader fabric
+modink install sodium --instance /caminho/da/instancia --game-version 1.21.1 --loader fabric
+modink list --instance /caminho/da/instancia
 ```
 
 ## Atualizar o programa
@@ -402,14 +402,14 @@ mcjava-manager list --instance /caminho/da/instancia
 ### Instalação via `go install`
 
 ```bash
-go install github.com/wedemmmdev/mcjava-manager/cmd/mcjava-manager@latest
+go install github.com/wedemmmdev/modink/cmd/modink@latest
 ```
 
 ### Build local
 
 ```bash
 git pull
-CGO_ENABLED=0 go build -buildvcs=false -trimpath -ldflags="-s -w" -o mcjava-manager ./cmd/mcjava-manager
+CGO_ENABLED=0 go build -buildvcs=false -trimpath -ldflags="-s -w" -o modink ./cmd/modink
 ```
 
 Substitua o binário antigo. O manifesto e o conteúdo das instâncias não são alterados ao atualizar o executável.
@@ -420,26 +420,26 @@ Remova o binário:
 
 ```bash
 # Linux/macOS
-rm ~/go/bin/mcjava-manager
+rm ~/go/bin/modink
 # ou
-sudo rm /usr/local/bin/mcjava-manager
+sudo rm /usr/local/bin/modink
 ```
 
 ```powershell
 # Windows
-Remove-Item "$env:USERPROFILE\go\bin\mcjava-manager.exe"
+Remove-Item "$env:USERPROFILE\go\bin\modink.exe"
 ```
 
 ```bash
 # Termux
-rm "$PREFIX/bin/mcjava-manager"
+rm "$PREFIX/bin/modink"
 ```
 
-Remover o programa **não** remove mods, shader packs, resource packs nem o manifesto. Se quiser que uma instância deixe de ter o conteúdo rastreado, remova os itens pela CLI/TUI ou apague manualmente `.mcjava-manager/installed.json` depois de fechar o programa. Os arquivos de conteúdo continuam na instância e passarão a aparecer como não rastreados.
+Remover o programa **não** remove mods, shader packs, resource packs nem o manifesto. Se quiser que uma instância deixe de ter o conteúdo rastreado, remova os itens pela CLI/TUI ou apague manualmente `.modink/installed.json` depois de fechar o programa. Os arquivos de conteúdo continuam na instância e passarão a aparecer como não rastreados.
 
 ## Solução de problemas
 
-### `mcjava-manager: command not found`
+### `modink: command not found`
 
 O binário não está no `PATH`. Confira onde o Go o instalou:
 
@@ -456,10 +456,10 @@ No Windows, confirme que `%USERPROFILE%\go\bin` está na variável `Path` do usu
 As mensagens do programa incluem orientação por plataforma:
 
 - **Windows:** execute o terminal como Administrador ou escolha uma pasta dentro do perfil do usuário; verifique a Proteção contra Ransomware e o antivírus.
-- **Termux:** execute `termux-setup-storage` e use uma pasta em `~/storage/shared/...`. Se o erro ocorrer ao executar o próprio `mcjava-manager`, conceda permissão de execução:
+- **Termux:** execute `termux-setup-storage` e use uma pasta em `~/storage/shared/...`. Se o erro ocorrer ao executar o próprio `modink`, conceda permissão de execução:
 
   ```bash
-  chmod +x "$PREFIX/bin/mcjava-manager"
+  chmod +x "$PREFIX/bin/modink"
   ```
 - **macOS:** verifique **Privacidade e Segurança > Arquivos e Pastas** ou **Acesso Total ao Disco**.
 - **Linux:** confira as permissões com `ls -ld` e, se for seguro, conceda escrita com `chmod u+w`.
@@ -488,13 +488,13 @@ Desative o carimbo de VCS:
 
 ```bash
 CGO_ENABLED=0 go build -buildvcs=false -trimpath -ldflags="-s -w" \
-  -o mcjava-manager ./cmd/mcjava-manager
+  -o modink ./cmd/modink
 ```
 
 Para `go install`, o equivalente é:
 
 ```bash
-GOFLAGS=-buildvcs=false go install github.com/wedemmmdev/mcjava-manager/cmd/mcjava-manager@latest
+GOFLAGS=-buildvcs=false go install github.com/wedemmmdev/modink/cmd/modink@latest
 ```
 
 Se você precisa manter as informações de VCS e confia no diretório, marque-o como seguro:
@@ -505,7 +505,7 @@ git config --global --add safe.directory "$(pwd)"
 
 Só use `safe.directory` em repositórios que você mesmo clonou ou controla.
 
-### `mv: cannot stat 'mcjava-manager': No such file or directory`
+### `mv: cannot stat 'modink': No such file or directory`
 
 O `mv` só funciona depois que o build termina com sucesso. Se o `go build` falhou, corrija o erro exibido antes de executar o `mv` novamente.
 
@@ -519,7 +519,7 @@ Use:
 
 ```powershell
 $env:CGO_ENABLED = "0"
-go build -buildvcs=false -trimpath -ldflags="-s -w" -o mcjava-manager.exe .\cmd\mcjava-manager
+go build -buildvcs=false -trimpath -ldflags="-s -w" -o modink.exe .\cmd\modink
 ```
 
 ### `arquivo já existe` ao instalar
@@ -527,7 +527,7 @@ go build -buildvcs=false -trimpath -ldflags="-s -w" -o mcjava-manager.exe .\cmd\
 O destino já contém um arquivo não rastreado com o mesmo nome. Confirme que o arquivo pode ser substituído e use:
 
 ```bash
-mcjava-manager install <projeto> --instance <caminho> --overwrite
+modink install <projeto> --instance <caminho> --overwrite
 ```
 
 Na TUI, pressione `o` na tela do projeto ou na tela de saída para ativar a sobrescrita e repita a operação.

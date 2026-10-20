@@ -1,6 +1,6 @@
 # Guia de uso
 
-Este documento descreve os comandos, flags, fluxos de trabalho e comportamentos do `mcjava-manager`.
+Este documento descreve os comandos, flags, fluxos de trabalho e comportamentos do **Modink**.
 
 ## Conceitos
 
@@ -9,15 +9,15 @@ Este documento descreve os comandos, flags, fluxos de trabalho e comportamentos 
 - **Projeto:** mod, shader, resource pack etc. identificado por slug ou ID.
 - **Versão:** lançamento concreto de um projeto, com arquivos, loaders, versões do jogo e canal.
 - **Canal:** estabilidade da versão: `release`, `beta` ou `alpha`.
-- **Conteúdo rastreado:** arquivo instalado pelo `mcjava-manager` e registrado no manifesto.
+- **Conteúdo rastreado:** arquivo instalado pelo **Modink** e registrado no manifesto.
 - **Conteúdo não rastreado:** arquivo que já estava em uma pasta gerenciada, mas não foi instalado pelo programa. Ele é listado, mas não é alterado sem uma ação explícita.
-- **Manifesto:** arquivo `.mcjava-manager/installed.json` dentro da instância.
+- **Manifesto:** arquivo `.modink/installed.json` dentro da instância.
 
 ## Flags globais
 
 ```text
--i, --instance <caminho>   Caminho da instância (env: MCJAVA_MANAGER_INSTANCE)
-    --config <arquivo>     Arquivo de configuração (env: MCJAVA_MANAGER_CONFIG)
+-i, --instance <caminho>   Caminho da instância (env: MODINK_INSTANCE)
+    --config <arquivo>     Arquivo de configuração (env: MODINK_CONFIG)
     --no-color             Desativa cores e estilos visuais
 -v, --verbose              Reservada para logs detalhados (ainda sem efeito)
 -h, --help                 Ajuda
@@ -28,14 +28,14 @@ Este documento descreve os comandos, flags, fluxos de trabalho e comportamentos 
 
 ```bash
 # Argumento posicional
-mcjava-manager /caminho/da/instancia
+modink /caminho/da/instancia
 
 # Flag
-mcjava-manager --instance /caminho/da/instancia list
+modink --instance /caminho/da/instancia list
 
 # Variável de ambiente
-export MCJAVA_MANAGER_INSTANCE=/caminho/da/instancia
-mcjava-manager list
+export MODINK_INSTANCE=/caminho/da/instancia
+modink list
 ```
 
 Se `--instance` e o argumento posicional forem usados juntos, eles precisam apontar para o mesmo caminho. Caminhos começando com `~` são expandidos. Caminhos relativos são convertidos para absolutos.
@@ -45,7 +45,7 @@ A instância precisa existir e ser um diretório. O programa cria as pastas de c
 ## Comando raiz
 
 ```bash
-mcjava-manager [instância]
+modink [instância]
 ```
 
 Sem subcomando e com uma instância informada, abre a TUI.
@@ -53,7 +53,7 @@ Sem subcomando e com uma instância informada, abre a TUI.
 Sem instância, exibe a ajuda:
 
 ```bash
-mcjava-manager
+modink
 ```
 
 ## `search`
@@ -61,7 +61,7 @@ mcjava-manager
 Busca projetos no Modrinth sem precisar de uma instância.
 
 ```bash
-mcjava-manager search [termo] [flags]
+modink search [termo] [flags]
 ```
 
 | Flag | Descrição |
@@ -78,12 +78,12 @@ mcjava-manager search [termo] [flags]
 Exemplos:
 
 ```bash
-mcjava-manager search sodium
-mcjava-manager search iris --loader fabric --game-version 1.21.1
-mcjava-manager search --type shader --game-version 1.21.1
-mcjava-manager search "resource pack" --category vanilla-like --limit 10
-mcjava-manager search sodium --sort downloads --limit 5
-mcjava-manager search sodium --offset 20
+modink search sodium
+modink search iris --loader fabric --game-version 1.21.1
+modink search --type shader --game-version 1.21.1
+modink search "resource pack" --category vanilla-like --limit 10
+modink search sodium --sort downloads --limit 5
+modink search sodium --offset 20
 ```
 
 Sem um termo, a busca lista projetos em destaque para os filtros informados. A saída mostra total, tabela de resultados e a indicação da próxima página quando houver.
@@ -93,7 +93,7 @@ Sem um termo, a busca lista projetos em destaque para os filtros informados. A s
 Exibe metadados de um projeto.
 
 ```bash
-mcjava-manager info <slug|id> [flags]
+modink info <slug|id> [flags]
 ```
 
 | Flag | Descrição |
@@ -104,9 +104,9 @@ mcjava-manager info <slug|id> [flags]
 Exemplos:
 
 ```bash
-mcjava-manager info sodium
-mcjava-manager info sodium --description
-mcjava-manager info AANobbMI
+modink info sodium
+modink info sodium --description
+modink info AANobbMI
 ```
 
 ## `versions`
@@ -114,7 +114,7 @@ mcjava-manager info AANobbMI
 Lista as versões de um projeto.
 
 ```bash
-mcjava-manager versions <slug|id> [flags]
+modink versions <slug|id> [flags]
 ```
 
 | Flag | Descrição |
@@ -129,11 +129,11 @@ mcjava-manager versions <slug|id> [flags]
 Exemplos:
 
 ```bash
-mcjava-manager versions sodium
-mcjava-manager versions sodium --game-version 1.21.1 --loader fabric
-mcjava-manager versions sodium --channel release --limit 10
-mcjava-manager versions sodium --channel release,beta
-mcjava-manager versions sodium --offset 20
+modink versions sodium
+modink versions sodium --game-version 1.21.1 --loader fabric
+modink versions sodium --channel release --limit 10
+modink versions sodium --channel release,beta
+modink versions sodium --offset 20
 ```
 
 As versões são retornadas pelo provedor e paginadas localmente. A saída inclui o ID da versão, que pode ser usado em `install --version`.
@@ -143,7 +143,7 @@ As versões são retornadas pelo provedor e paginadas localmente. A saída inclu
 Instala um mod, shader pack ou resource pack.
 
 ```bash
-mcjava-manager install <slug|id> [flags]
+modink install <slug|id> [flags]
 ```
 
 | Flag | Descrição |
@@ -156,7 +156,7 @@ mcjava-manager install <slug|id> [flags]
 | `--overwrite` | Substitui arquivo não rastreado e força a reinstalação |
 | `--no-dependencies` | Não instala dependências obrigatórias automaticamente |
 
-> `--version` em `install` recebe o ID de uma versão do projeto. Para ver a versão do binário, use `mcjava-manager --version` ou `mcjava-manager version`.
+> `--version` em `install` recebe o ID de uma versão do projeto. Para ver a versão do binário, use `modink --version` ou `modink version`.
 
 ### Seleção automática de versão
 
@@ -169,7 +169,7 @@ Sem `--version`, o programa escolhe a versão mais recente compatível com os fi
 Exemplo:
 
 ```bash
-mcjava-manager install sodium \
+modink install sodium \
   --instance /caminho/da/instancia \
   --game-version 1.21.1 \
   --loader fabric
@@ -182,8 +182,8 @@ mcjava-manager install sodium \
 Use o ID retornado por `versions`:
 
 ```bash
-mcjava-manager versions sodium --game-version 1.21.1 --loader fabric
-mcjava-manager install sodium \
+modink versions sodium --game-version 1.21.1 --loader fabric
+modink install sodium \
   --instance /caminho/da/instancia \
   --version SMxNOGZ6
 ```
@@ -205,7 +205,7 @@ Se uma dependência já estiver instalada em outra versão, o `install` recusa a
 Para instalar apenas o arquivo selecionado:
 
 ```bash
-mcjava-manager install sodium --instance /caminho/da/instancia --no-dependencies
+modink install sodium --instance /caminho/da/instancia --no-dependencies
 ```
 
 ### Conflitos e sobrescrita
@@ -219,7 +219,7 @@ mcjava-manager install sodium --instance /caminho/da/instancia --no-dependencies
 Use `--overwrite` somente depois de conferir o arquivo existente:
 
 ```bash
-mcjava-manager install sodium --instance /caminho/da/instancia --overwrite
+modink install sodium --instance /caminho/da/instancia --overwrite
 ```
 
 ### Checksums e download
@@ -238,7 +238,7 @@ Downloads sem checksum utilizável são recusados.
 Lista o conteúdo rastreado e os arquivos não rastreados nas pastas gerenciadas.
 
 ```bash
-mcjava-manager list [flags]
+modink list [flags]
 ```
 
 | Flag | Descrição |
@@ -248,9 +248,9 @@ mcjava-manager list [flags]
 Exemplos:
 
 ```bash
-mcjava-manager list --instance /caminho/da/instancia
-mcjava-manager list --instance /caminho/da/instancia --type mod
-mcjava-manager list --instance /caminho/da/instancia --type shader
+modink list --instance /caminho/da/instancia
+modink list --instance /caminho/da/instancia --type mod
+modink list --instance /caminho/da/instancia --type shader
 ```
 
 A saída mostra:
@@ -275,7 +275,7 @@ Status possíveis de um item rastreado:
 Verifica e instala versões mais recentes do conteúdo rastreado.
 
 ```bash
-mcjava-manager update [slug|id|arquivo ...] [flags]
+modink update [slug|id|arquivo ...] [flags]
 ```
 
 Sem argumentos, atualiza todos os itens rastreados. Com argumentos, limita a atualização aos itens correspondentes.
@@ -303,19 +303,19 @@ Exemplos:
 
 ```bash
 # Verificar todo o conteúdo
-mcjava-manager update --instance /caminho/da/instancia --check
+modink update --instance /caminho/da/instancia --check
 
 # Atualizar todo o conteúdo
-mcjava-manager update --instance /caminho/da/instancia
+modink update --instance /caminho/da/instancia
 
 # Atualizar somente um projeto
-mcjava-manager update sodium --instance /caminho/da/instancia
+modink update sodium --instance /caminho/da/instancia
 
 # Atualizar um arquivo específico
-mcjava-manager update mods/sodium.jar --instance /caminho/da/instancia
+modink update mods/sodium.jar --instance /caminho/da/instancia
 
 # Forçar a busca em outro canal
-mcjava-manager update sodium --instance /caminho/da/instancia --channel beta
+modink update sodium --instance /caminho/da/instancia --channel beta
 ```
 
 ### Filtros padrão
@@ -355,7 +355,7 @@ Use `--no-dependencies` para limitar a operação aos itens selecionados.
 Remove conteúdo de uma instância.
 
 ```bash
-mcjava-manager remove <arquivo|slug|id> [flags]
+modink remove <arquivo|slug|id> [flags]
 ```
 
 | Flag | Descrição |
@@ -372,10 +372,10 @@ O argumento pode ser:
 Exemplos:
 
 ```bash
-mcjava-manager remove sodium --instance /caminho/da/instancia
-mcjava-manager remove sodium.jar --instance /caminho/da/instancia --type mod
-mcjava-manager remove mods/sodium.jar --instance /caminho/da/instancia
-mcjava-manager remove resourcepacks/meu-pack.zip --instance /caminho/da/instancia
+modink remove sodium --instance /caminho/da/instancia
+modink remove sodium.jar --instance /caminho/da/instancia --type mod
+modink remove mods/sodium.jar --instance /caminho/da/instancia
+modink remove resourcepacks/meu-pack.zip --instance /caminho/da/instancia
 ```
 
 Comportamento:
@@ -390,7 +390,7 @@ Comportamento:
 ## `version`
 
 ```bash
-mcjava-manager version
+modink version
 ```
 
 Mostra versão, commit, data de build e versão do Go usada na compilação. Parte das informações depende de metadados injetados no build ou do módulo instalado com `go install`.
@@ -401,38 +401,38 @@ Gera o script de autocompletar do Cobra para o shell:
 
 ```bash
 # Bash
-mcjava-manager completion bash
+modink completion bash
 
 # Zsh
-mcjava-manager completion zsh
+modink completion zsh
 
 # Fish
-mcjava-manager completion fish
+modink completion fish
 
 # PowerShell
-mcjava-manager completion powershell
+modink completion powershell
 ```
 
 Exemplos de instalação:
 
 ```bash
 # Bash (carregamento no próximo shell)
-mcjava-manager completion bash > ~/.local/share/bash-completion/completions/mcjava-manager
+modink completion bash > ~/.local/share/bash-completion/completions/modink
 ```
 
 ```zsh
 # Zsh
-mcjava-manager completion zsh > "${fpath[1]}/_mcjava-manager"
+modink completion zsh > "${fpath[1]}/_modink"
 ```
 
 ```fish
 # Fish
-mcjava-manager completion fish > ~/.config/fish/completions/mcjava-manager.fish
+modink completion fish > ~/.config/fish/completions/modink.fish
 ```
 
 ```powershell
 # PowerShell (adicionar ao seu profile)
-mcjava-manager completion powershell | Out-String | Invoke-Expression
+modink completion powershell | Out-String | Invoke-Expression
 ```
 
 ## Interface interativa (TUI)
@@ -440,7 +440,7 @@ mcjava-manager completion powershell | Out-String | Invoke-Expression
 Abra com:
 
 ```bash
-mcjava-manager --instance /caminho/da/instancia
+modink --instance /caminho/da/instancia
 ```
 
 A instância é preparada no início: as pastas `mods/`, `shaderpacks/`, `resourcepacks/` e `saves/` são criadas se necessário.
@@ -529,7 +529,7 @@ O Modrinth não exige chave. A configuração atual é voltada ao futuro adaptad
 ### Precedência da chave CurseForge
 
 1. `CURSEFORGE_API_KEY`;
-2. `curseforge.api_key` em `~/.mcjava-manager.yaml` ou no arquivo indicado por `--config`.
+2. `curseforge.api_key` em `~/.modink.yaml` ou no arquivo indicado por `--config`.
 
 Exemplo:
 
@@ -541,7 +541,7 @@ curseforge:
 Restrinja o arquivo:
 
 ```bash
-chmod 600 ~/.mcjava-manager.yaml
+chmod 600 ~/.modink.yaml
 ```
 
 A camada de configuração detecta permissões inseguras e redige chaves em logs e serializações. Como o adaptador CurseForge ainda não está implementado, os comandos atuais só funcionam com `--provider modrinth` e não leem o arquivo de configuração.
@@ -551,7 +551,7 @@ A camada de configuração detecta permissões inseguras e redige chaves em logs
 Local:
 
 ```text
-<caminho-da-instância>/.mcjava-manager/installed.json
+<caminho-da-instância>/.modink/installed.json
 ```
 
 Formato resumido:
@@ -615,7 +615,7 @@ Não edite o manifesto manualmente enquanto o gerenciador estiver em uso. Para b
 O adaptador CurseForge ainda não existe. Use o provedor padrão:
 
 ```bash
-mcjava-manager search sodium --provider modrinth
+modink search sodium --provider modrinth
 ```
 
 ### `nenhuma versão instalável foi encontrada`
@@ -628,7 +628,7 @@ Nenhuma versão atende aos filtros. Tente:
 - remover filtros para ver o que existe:
 
 ```bash
-mcjava-manager versions <projeto>
+modink versions <projeto>
 ```
 
 ### `o arquivo ... já está registrado para ...`
@@ -636,7 +636,7 @@ mcjava-manager versions <projeto>
 O caminho de destino já pertence a outro projeto no manifesto. Verifique com:
 
 ```bash
-mcjava-manager list --instance /caminho/da/instancia
+modink list --instance /caminho/da/instancia
 ```
 
 Remova o conteúdo antigo ou escolha outro projeto/versão.
@@ -646,12 +646,12 @@ Remova o conteúdo antigo ou escolha outro projeto/versão.
 Use o caminho relativo ou `--type` para desambiguar:
 
 ```bash
-mcjava-manager remove mods/sodium.jar --instance /caminho/da/instancia
-mcjava-manager remove sodium --instance /caminho/da/instancia --type mod
+modink remove mods/sodium.jar --instance /caminho/da/instancia
+modink remove sodium --instance /caminho/da/instancia --type mod
 ```
 
 ### `manifesto de conteúdo instalado inválido`
 
-O arquivo `.mcjava-manager/installed.json` está corrompido ou usa um esquema desconhecido. Se você tiver backup, restaure-o. Caso contrário, remova o manifesto com a instância fechada; os arquivos de conteúdo permanecerão e passarão a ser tratados como não rastreados.
+O arquivo `.modink/installed.json` está corrompido ou usa um esquema desconhecido. Se você tiver backup, restaure-o. Caso contrário, remova o manifesto com a instância fechada; os arquivos de conteúdo permanecerão e passarão a ser tratados como não rastreados.
 
 Para problemas de instalação, permissões e plataforma, consulte [INSTALL.md](INSTALL.md).

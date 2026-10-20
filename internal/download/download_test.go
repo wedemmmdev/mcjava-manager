@@ -16,8 +16,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/wedemmmdev/mcjava-manager/internal/instance"
-	"github.com/wedemmmdev/mcjava-manager/pkg/modsource"
+	"github.com/wedemmmdev/modink/internal/instance"
+	"github.com/wedemmmdev/modink/pkg/modsource"
 )
 
 func hashesFor(content []byte) []modsource.Hash {
@@ -33,7 +33,7 @@ func hashesFor(content []byte) []modsource.Hash {
 func testDownloader(server *httptest.Server, opts ...Option) *Client {
 	options := []Option{
 		WithHTTPClient(server.Client()),
-		WithUserAgent("mcjava-manager/test"),
+		WithUserAgent("modink/test"),
 	}
 	options = append(options, opts...)
 
@@ -48,7 +48,7 @@ func assertNoTempFiles(t *testing.T, directory string) {
 		t.Fatalf("ReadDir() error = %v", err)
 	}
 	for _, entry := range entries {
-		if strings.HasPrefix(entry.Name(), ".mcjava-manager-") {
+		if strings.HasPrefix(entry.Name(), ".modink-") {
 			t.Fatalf("temporary file %q was not removed", entry.Name())
 		}
 	}
@@ -84,7 +84,7 @@ func TestDownloadVerifiesHashesAndWritesAtomically(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %q, want GET", r.Method)
 		}
-		if got := r.Header.Get("User-Agent"); got != "mcjava-manager/test" {
+		if got := r.Header.Get("User-Agent"); got != "modink/test" {
 			t.Errorf("User-Agent = %q", got)
 		}
 		if got := r.Header.Get("Accept"); got != "application/octet-stream" {

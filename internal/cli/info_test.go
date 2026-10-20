@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/wedemmmdev/mcjava-manager/pkg/modsource"
+	"github.com/wedemmmdev/modink/pkg/modsource"
 )
 
 func executeInfoCommand(t *testing.T, client modsource.Client, args ...string) (string, string, error) {
