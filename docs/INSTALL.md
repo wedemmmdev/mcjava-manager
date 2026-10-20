@@ -281,6 +281,41 @@ touch "$HOME/storage/shared/teste-mcjava-manager"
 rm "$HOME/storage/shared/teste-mcjava-manager"
 ```
 
+### Execução via Shizuku (rish) para instâncias restritas
+
+Em algumas instalações, o Termux não consegue acessar ou executar arquivos em pastas como `Android/data`. O Shizuku pode executar comandos como o usuário `shell` do Android, mas o SELinux impede que esse usuário execute binários que estejam:
+
+- dentro da pasta privada do Termux;
+- em armazenamento público montado como `noexec`, como `/sdcard`.
+
+Para contornar essa restrição, copie o binário para `/data/local/tmp/`, que permite execução nativa pelo usuário do Shizuku.
+
+1. Copie o binário do Termux para uma pasta pública:
+
+   ```bash
+   cp "$PREFIX/bin/mcjava-manager" /sdcard/Download/
+   ```
+
+2. Use o Shizuku para mover o binário para o diretório executável do Android:
+
+   ```bash
+   rish -c "cp /sdcard/Download/mcjava-manager /data/local/tmp/"
+   ```
+
+3. Dê permissão de execução nativa via Shizuku:
+
+   ```bash
+   rish -c "chmod +x /data/local/tmp/mcjava-manager"
+   ```
+
+4. Execute o programa pelo Shizuku, passando o caminho absoluto da instância:
+
+   ```bash
+   rish -c "/data/local/tmp/mcjava-manager --instance /sdcard/Android/data/nome.do.seu.launcher/files/sua_instancia"
+   ```
+
+> **Atenção:** sempre que atualizar o aplicativo — por exemplo, após um novo `git pull` e uma nova compilação — repita a cópia do binário para `/data/local/tmp/` e o `chmod +x`. O Shizuku executa a cópia que está em `/data/local/tmp/`, não o binário instalado em `$PREFIX/bin`.
+
 ## Compilação cruzada
 
 Como o projeto não usa `cgo`, é possível gerar binários independentes para outras plataformas. Crie a pasta de saída antes:
