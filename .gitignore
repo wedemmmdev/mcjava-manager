@@ -1,0 +1,15 @@
+# Build artifacts
+/bin/
+/dist/
+/coverage.out
+*.test
+*.exe
+
+# Local configuration may contain API keys; never commit it.
+.mcjava-manager.yaml
+.env
+.env.*
+
+# Editor and OS metadata
+.DS_Store
+Thumbs.db
