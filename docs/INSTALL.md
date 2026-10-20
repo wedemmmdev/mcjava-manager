@@ -243,6 +243,7 @@ cd mcjava-manager
 CGO_ENABLED=0 go build -buildvcs=false -trimpath -ldflags="-s -w" -o mcjava-manager ./cmd/mcjava-manager
 mkdir -p "$PREFIX/bin"
 mv mcjava-manager "$PREFIX/bin/mcjava-manager"
+chmod +x "$PREFIX/bin/mcjava-manager"
 ```
 
 Verifique:
@@ -409,7 +410,11 @@ No Windows, confirme que `%USERPROFILE%\go\bin` está na variável `Path` do usu
 As mensagens do programa incluem orientação por plataforma:
 
 - **Windows:** execute o terminal como Administrador ou escolha uma pasta dentro do perfil do usuário; verifique a Proteção contra Ransomware e o antivírus.
-- **Termux:** execute `termux-setup-storage` e use uma pasta em `~/storage/shared/...`.
+- **Termux:** execute `termux-setup-storage` e use uma pasta em `~/storage/shared/...`. Se o erro ocorrer ao executar o próprio `mcjava-manager`, conceda permissão de execução:
+
+  ```bash
+  chmod +x "$PREFIX/bin/mcjava-manager"
+  ```
 - **macOS:** verifique **Privacidade e Segurança > Arquivos e Pastas** ou **Acesso Total ao Disco**.
 - **Linux:** confira as permissões com `ls -ld` e, se for seguro, conceda escrita com `chmod u+w`.
 
