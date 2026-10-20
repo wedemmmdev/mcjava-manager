@@ -462,7 +462,7 @@ func TestInstallCommandRejectsChecksumMismatch(t *testing.T) {
 	}
 
 	instancePath := t.TempDir()
-	_, _, err := executeInstallCommand(
+	out, _, err := executeInstallCommand(
 		t,
 		client,
 		&options{InstancePath: instancePath},
@@ -472,6 +472,9 @@ func TestInstallCommandRejectsChecksumMismatch(t *testing.T) {
 	)
 	if err == nil || !strings.Contains(err.Error(), "checksum") {
 		t.Fatalf("Execute() error = %v, want checksum error", err)
+	}
+	if out != "" {
+		t.Fatalf("stdout = %q, want empty on download failure", out)
 	}
 	mods := filepath.Join(instancePath, instance.ModsDirName)
 	if _, statErr := os.Stat(filepath.Join(mods, "sodium.jar")); !errors.Is(statErr, os.ErrNotExist) {
@@ -501,7 +504,7 @@ func TestInstallCommandRejectsMissingChecksum(t *testing.T) {
 	}
 
 	instancePath := t.TempDir()
-	_, _, err := executeInstallCommand(
+	out, _, err := executeInstallCommand(
 		t,
 		client,
 		&options{InstancePath: instancePath},
@@ -511,6 +514,9 @@ func TestInstallCommandRejectsMissingChecksum(t *testing.T) {
 	)
 	if err == nil || !strings.Contains(err.Error(), "checksum SHA1/SHA512") {
 		t.Fatalf("Execute() error = %v, want missing checksum error", err)
+	}
+	if out != "" {
+		t.Fatalf("stdout = %q, want empty on download failure", out)
 	}
 	if calls != 0 {
 		t.Fatalf("server calls = %d, want 0", calls)

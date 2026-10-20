@@ -387,8 +387,8 @@ func TestAuthorsText(t *testing.T) {
 }
 
 func TestSanitizeText(t *testing.T) {
-	got := sanitizeText("a\x1bb\nc\td\x7f\u202e")
-	want := "ab c d"
+	got := sanitizeText("a\x1bb\nc\td\x7f\u202e\u2028e\u200ef")
+	want := "ab c d ef"
 
 	if got != want {
 		t.Fatalf("sanitizeText() = %q, want %q", got, want)
@@ -396,16 +396,22 @@ func TestSanitizeText(t *testing.T) {
 	if strings.ContainsRune(got, '\x1b') {
 		t.Fatal("sanitizeText() kept an escape character")
 	}
+	if strings.ContainsRune(got, '\u2028') || strings.ContainsRune(got, '\u200e') {
+		t.Fatal("sanitizeText() kept a line separator or bidi mark")
+	}
 }
 
 func TestSanitizeBlock(t *testing.T) {
-	got := sanitizeBlock("a\x1bb\nc\td\x7f\u202e")
-	want := "ab\nc\td"
+	got := sanitizeBlock("a\x1bb\nc\td\x7f\u202e\u2028e\u200ef")
+	want := "ab\nc\td\nef"
 
 	if got != want {
 		t.Fatalf("sanitizeBlock() = %q, want %q", got, want)
 	}
 	if strings.ContainsRune(got, '\x1b') {
 		t.Fatal("sanitizeBlock() kept an escape character")
+	}
+	if strings.ContainsRune(got, '\u200e') {
+		t.Fatal("sanitizeBlock() kept a bidi mark")
 	}
 }

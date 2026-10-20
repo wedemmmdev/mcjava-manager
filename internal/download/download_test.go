@@ -184,6 +184,103 @@ func TestDownloadRejectsExistingTargetBeforeNetwork(t *testing.T) {
 	}
 }
 
+func TestDownloadRejectsBrokenSymlinkWithoutOverwrite(t *testing.T) {
+	calls := 0
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		calls++
+		_, _ = io.WriteString(w, "novo")
+	}))
+	t.Cleanup(server.Close)
+
+	directory := t.TempDir()
+	target := filepath.Join(directory, "sodium.jar")
+	if err := os.Symlink(filepath.Join(directory, "missing.jar"), target); err != nil {
+		t.Skipf("não foi possível criar link simbólico: %v", err)
+	}
+
+	_, err := testDownloader(server).Download(context.Background(), Request{
+		URL:            server.URL,
+		Target:         target,
+		ExpectedHashes: hashesFor([]byte("novo")),
+	})
+	if !errors.Is(err, ErrTargetExists) {
+		t.Fatalf("Download() error = %v, want ErrTargetExists", err)
+	}
+	if calls != 0 {
+		t.Fatalf("server calls = %d, want 0", calls)
+	}
+	info, err := os.Lstat(target)
+	if err != nil || info.Mode()&os.ModeSymlink == 0 {
+		t.Fatalf("target symlink was replaced: info=%v err=%v", info, err)
+	}
+}
+
+func TestDownloadRejectsSymlinkToDirectory(t *testing.T) {
+	directory := t.TempDir()
+	targetDirectory := filepath.Join(directory, "mods")
+	if err := os.Mkdir(targetDirectory, 0o755); err != nil {
+		t.Fatalf("Mkdir() error = %v", err)
+	}
+	target := filepath.Join(directory, "sodium.jar")
+	if err := os.Symlink(targetDirectory, target); err != nil {
+		t.Skipf("não foi possível criar link simbólico: %v", err)
+	}
+
+	_, err := New().Download(context.Background(), Request{
+		URL:            "https://example.com/a.jar",
+		Target:         target,
+		ExpectedHashes: hashesFor([]byte("x")),
+		Overwrite:      true,
+	})
+	if err == nil || !strings.Contains(err.Error(), "aponta para um diretório") {
+		t.Fatalf("Download() error = %v, want symlinked directory error", err)
+	}
+	info, statErr := os.Lstat(target)
+	if statErr != nil || info.Mode()&os.ModeSymlink == 0 {
+		t.Fatalf("target symlink was replaced: info=%v err=%v", info, statErr)
+	}
+}
+
+func TestDownloadReplacesBrokenSymlinkWithOverwrite(t *testing.T) {
+	content := []byte("novo")
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write(content)
+	}))
+	t.Cleanup(server.Close)
+
+	directory := t.TempDir()
+	target := filepath.Join(directory, "sodium.jar")
+	if err := os.Symlink(filepath.Join(directory, "missing.jar"), target); err != nil {
+		t.Skipf("não foi possível criar link simbólico: %v", err)
+	}
+
+	_, err := testDownloader(server).Download(context.Background(), Request{
+		URL:            server.URL,
+		Target:         target,
+		ExpectedHashes: hashesFor(content),
+		Overwrite:      true,
+	})
+	if err != nil {
+		t.Fatalf("Download() error = %v", err)
+	}
+
+	info, err := os.Lstat(target)
+	if err != nil {
+		t.Fatalf("Lstat() error = %v", err)
+	}
+	if !info.Mode().IsRegular() {
+		t.Fatalf("target mode = %v, want regular file", info.Mode())
+	}
+	got, err := os.ReadFile(target)
+	if err != nil {
+		t.Fatalf("ReadFile() error = %v", err)
+	}
+	if string(got) != string(content) {
+		t.Fatalf("content = %q, want %q", got, content)
+	}
+	assertNoTempFiles(t, directory)
+}
+
 func TestDownloadOverwritesExistingTarget(t *testing.T) {
 	content := []byte("novo")
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

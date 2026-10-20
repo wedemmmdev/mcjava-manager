@@ -129,15 +129,14 @@ func truncate(value string, max int) string {
 func sanitizeText(value string) string {
 	return strings.Map(func(r rune) rune {
 		switch {
-		case r == '\n' || r == '\r' || r == '\t':
+		case r == '\n' || r == '\r' || r == '\t' || r == 0x2028 || r == 0x2029:
 			return ' '
 		case r < 0x20 || r == 0x7f:
 			return -1
 		case r >= 0x80 && r <= 0x9f:
 			return -1
-		case r >= 0x202a && r <= 0x202e:
-			return -1
-		case r >= 0x2066 && r <= 0x2069:
+		case r == 0x061c || (r >= 0x200e && r <= 0x200f) ||
+			(r >= 0x202a && r <= 0x202e) || (r >= 0x2066 && r <= 0x2069):
 			return -1
 		default:
 			return r
@@ -152,13 +151,14 @@ func sanitizeBlock(value string) string {
 		switch {
 		case r == '\n' || r == '\t':
 			return r
+		case r == 0x2028 || r == 0x2029:
+			return '\n'
 		case r < 0x20 || r == 0x7f:
 			return -1
 		case r >= 0x80 && r <= 0x9f:
 			return -1
-		case r >= 0x202a && r <= 0x202e:
-			return -1
-		case r >= 0x2066 && r <= 0x2069:
+		case r == 0x061c || (r >= 0x200e && r <= 0x200f) ||
+			(r >= 0x202a && r <= 0x202e) || (r >= 0x2066 && r <= 0x2069):
 			return -1
 		default:
 			return r

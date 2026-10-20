@@ -274,11 +274,21 @@ func validateRequest(request *Request) error {
 }
 
 func ensureTarget(target string, overwrite bool) error {
-	info, err := os.Stat(target)
+	info, err := os.Lstat(target)
 	switch {
 	case err == nil:
 		if info.IsDir() {
 			return fmt.Errorf("o destino do download %q é um diretório", target)
+		}
+		if info.Mode()&os.ModeSymlink != 0 {
+			if linkInfo, linkErr := os.Stat(target); linkErr == nil && linkInfo.IsDir() {
+				return fmt.Errorf("o destino do download %q aponta para um diretório", target)
+			}
+		} else if !info.Mode().IsRegular() {
+			return fmt.Errorf(
+				"o destino do download %q não é um arquivo regular ou link simbólico",
+				target,
+			)
 		}
 		if !overwrite {
 			return fmt.Errorf("%w: %q", ErrTargetExists, target)

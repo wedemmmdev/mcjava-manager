@@ -38,6 +38,9 @@ persistente --instance.`,
   mcjava-manager info sodium
   mcjava-manager versions sodium --game-version 1.20.1 --loader fabric
   mcjava-manager install sodium --instance ./fabric-loader-0.19.5-1.20.1 --game-version 1.20.1 --loader fabric
+  mcjava-manager list --instance ./fabric-loader-0.19.5-1.20.1
+  mcjava-manager update --instance ./fabric-loader-0.19.5-1.20.1 --check
+  mcjava-manager remove sodium --instance ./fabric-loader-0.19.5-1.20.1
   mcjava-manager version`,
 		Args:          cobra.MaximumNArgs(1),
 		SilenceErrors: true,
@@ -67,6 +70,9 @@ persistente --instance.`,
 	cmd.AddCommand(newInfoCommand(nil))
 	cmd.AddCommand(newVersionsCommand(nil))
 	cmd.AddCommand(newInstallCommand(nil, opts, nil))
+	cmd.AddCommand(newListCommand(opts))
+	cmd.AddCommand(newRemoveCommand(opts))
+	cmd.AddCommand(newUpdateCommand(nil, opts, nil))
 
 	return cmd
 }

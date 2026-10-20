@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"path/filepath"
 	"sort"
 	"strings"
 
@@ -12,18 +11,20 @@ import (
 
 	"github.com/wedemmmdev/mcjava-manager/internal/download"
 	"github.com/wedemmmdev/mcjava-manager/internal/instance"
+	"github.com/wedemmmdev/mcjava-manager/internal/manifest"
 	"github.com/wedemmmdev/mcjava-manager/pkg/modsource"
 )
 
 var errInstallUnsupportedKind = errors.New("tipo de conteúdo não suportado para instalação")
 
 type installOptions struct {
-	provider    string
-	versionID   string
-	gameVersion string
-	loader      string
-	channels    []string
-	overwrite   bool
+	provider       string
+	versionID      string
+	gameVersion    string
+	loader         string
+	channels       []string
+	overwrite      bool
+	noDependencies bool
 }
 
 func newInstallCommand(client modsource.Client, globalOpts *options, downloader *download.Client) *cobra.Command {
@@ -42,10 +43,20 @@ Sem --version, a versão release mais recente compatível com --game-version e
 por "mcjava-manager versions"; nesse caso, os filtros informados são apenas
 validados contra a versão escolhida.
 
+Dependências obrigatórias são resolvidas e instaladas antes do projeto
+principal. Use --no-dependencies para instalar apenas o arquivo escolhido. Se
+uma dependência já estiver instalada em outra versão, a instalação é recusada
+para evitar substituições silenciosas; atualize-a explicitamente antes.
+
+Arquivos já rastreados para o mesmo projeto são substituídos automaticamente.
+Um arquivo não rastreado com o mesmo nome só é substituído com --overwrite.
+
 Os checksums SHA1/SHA512 publicados pelo provedor são verificados antes da
-instalação. Dependências obrigatórias ainda não são resolvidas automaticamente.`,
+instalação. O arquivo e os metadados são registrados no manifesto local da
+instância.`,
 		Example: `  mcjava-manager install sodium --instance ./minha-instancia --game-version 1.21.1 --loader fabric
   mcjava-manager install sodium --instance ./minha-instancia --version SMxNOGZ6
+  mcjava-manager install sodium --instance ./minha-instancia --no-dependencies
   mcjava-manager install sodium --instance ./minha-instancia --overwrite`,
 		Args:          cobra.ExactArgs(1),
 		SilenceErrors: true,
@@ -75,82 +86,35 @@ instalação. Dependências obrigatórias ainda não são resolvidas automaticam
 				return err
 			}
 
-			project, err := projectClient.GetProject(cmd.Context(), projectID)
-			if err != nil {
-				return fmt.Errorf("falha ao obter o projeto %q: %w", projectID, err)
-			}
-			project.ID = strings.TrimSpace(project.ID)
-			if project.ID == "" {
-				return fmt.Errorf("o provedor não retornou o ID do projeto %q", projectID)
-			}
-
-			directoryName, err := installDirectoryName(project.Type)
+			store, err := manifest.Load(inst)
 			if err != nil {
 				return err
 			}
 
-			version, err := selectInstallVersion(cmd.Context(), projectClient, project, opts, filter, channelExplicit)
-			if err != nil {
-				return err
-			}
+			installer := newContentInstaller(
+				projectClient,
+				downloader,
+				store,
+				inst,
+				filter,
+				channelExplicit,
+				opts.overwrite,
+				false,
+				!opts.noDependencies,
+				cmd.ErrOrStderr(),
+			)
 
-			file, err := version.PrimaryFile()
-			if err != nil {
-				return fmt.Errorf(
-					"a versão %q de %q não possui um arquivo instalável: %w",
-					versionDisplayLabel(version),
-					projectDisplayName(project),
-					err,
-				)
-			}
-			safeName, err := download.SafeFilename(file.Name)
-			if err != nil {
-				return fmt.Errorf("o provedor retornou um nome de arquivo inválido para %q: %w", projectDisplayName(project), err)
-			}
-
-			targetDirectory := filepath.Join(inst.Path, directoryName)
-			targetPath := filepath.Join(targetDirectory, safeName)
-
-			if err := inst.EnsureLayout(); err != nil {
-				return err
-			}
-
-			dl := downloader
-			if dl == nil {
-				dl = download.New(download.WithUserAgent(providerUserAgent()))
-			}
-
-			progress := newProgressPrinter(cmd.ErrOrStderr())
-			result, downloadErr := dl.Download(cmd.Context(), download.Request{
-				URL:            file.URL,
-				Target:         targetPath,
-				ExpectedHashes: file.Hashes,
-				Overwrite:      opts.overwrite,
-				Progress:       progress.Update,
-			})
-			finishErr := progress.Finish(downloadErr == nil)
-			if downloadErr != nil {
-				wrapped := wrapInstallDownloadError(downloadErr, safeName, targetDirectory)
-				if finishErr != nil {
-					return errors.Join(wrapped, finishErr)
+			outcomes, installErr := installer.InstallProject(cmd.Context(), projectID, opts.versionID)
+			writeErr := writeInstallOutcomes(cmd.OutOrStdout(), outcomes, false)
+			if writeErr != nil {
+				if installErr != nil {
+					return errors.Join(installErr, writeErr)
 				}
-				return wrapped
-			}
-			if finishErr != nil {
-				return fmt.Errorf("arquivo instalado em %q, mas falha ao finalizar o progresso: %w", result.Path, finishErr)
+
+				return writeErr
 			}
 
-			if _, err := fmt.Fprintf(
-				cmd.OutOrStdout(),
-				"Instalado %s %s em %s (checksum verificado)\n",
-				projectDisplayName(project),
-				versionDisplayLabel(version),
-				result.Path,
-			); err != nil {
-				return fmt.Errorf("arquivo instalado em %q, mas falha ao escrever o resultado: %w", result.Path, err)
-			}
-
-			return nil
+			return installErr
 		},
 	}
 
@@ -160,7 +124,8 @@ instalação. Dependências obrigatórias ainda não são resolvidas automaticam
 	flags.StringVarP(&opts.gameVersion, "game-version", "g", "", "versão do Minecraft (ex.: 1.20.1)")
 	flags.StringVarP(&opts.loader, "loader", "l", "", "loader (fabric, forge, neoforge, quilt, ...)")
 	flags.StringSliceVarP(&opts.channels, "channel", "c", nil, "canal: release, beta, alpha (padrão: release na seleção automática)")
-	flags.BoolVar(&opts.overwrite, "overwrite", false, "substitui o arquivo de mesmo nome se ele já existir")
+	flags.BoolVar(&opts.overwrite, "overwrite", false, "substitui arquivo não rastreado e força a reinstalação")
+	flags.BoolVar(&opts.noDependencies, "no-dependencies", false, "não instala dependências obrigatórias automaticamente")
 
 	return cmd
 }
@@ -214,6 +179,15 @@ func selectInstallVersion(
 		return version, nil
 	}
 
+	return selectLatestVersion(ctx, client, project, filter)
+}
+
+func selectLatestVersion(
+	ctx context.Context,
+	client modsource.Client,
+	project modsource.Project,
+	filter modsource.VersionFilter,
+) (modsource.Version, error) {
 	versions, err := client.ListVersions(ctx, project.ID, filter)
 	if err != nil {
 		return modsource.Version{}, fmt.Errorf("falha ao listar as versões de %q: %w", projectDisplayName(project), err)
@@ -234,6 +208,20 @@ func selectInstallVersion(
 }
 
 func validateVersionSelection(version modsource.Version, filter modsource.VersionFilter, channelExplicit bool) error {
+	if err := validateVersionCompatibility(version, filter); err != nil {
+		return err
+	}
+	if channelExplicit && len(filter.Channels) > 0 && !containsChannel(version.Channel, filter.Channels) {
+		return fmt.Errorf(
+			"a versão %q não pertence aos canais selecionados",
+			versionDisplayLabel(version),
+		)
+	}
+
+	return nil
+}
+
+func validateVersionCompatibility(version modsource.Version, filter modsource.VersionFilter) error {
 	if filter.GameVersion != "" && !containsFold(version.GameVersions, filter.GameVersion) {
 		return fmt.Errorf(
 			"a versão %q não é compatível com a versão do Minecraft %q",
@@ -246,12 +234,6 @@ func validateVersionSelection(version modsource.Version, filter modsource.Versio
 			"a versão %q não é compatível com o loader %q",
 			versionDisplayLabel(version),
 			filter.Loader,
-		)
-	}
-	if channelExplicit && len(filter.Channels) > 0 && !containsChannel(version.Channel, filter.Channels) {
-		return fmt.Errorf(
-			"a versão %q não pertence aos canais selecionados",
-			versionDisplayLabel(version),
 		)
 	}
 
@@ -284,21 +266,17 @@ func newestDownloadableVersion(versions []modsource.Version) (modsource.Version,
 }
 
 func installDirectoryName(kind modsource.ProjectKind) (string, error) {
-	switch kind {
-	case modsource.KindMod:
-		return instance.ModsDirName, nil
-	case modsource.KindShaderPack:
-		return instance.ShaderPacksDirName, nil
-	case modsource.KindResourcePack:
-		return instance.ResourcePacksDirName, nil
-	default:
-		label := displayProjectType(kind)
-		if label == "-" {
-			label = "tipo de projeto desconhecido"
-		}
-
-		return "", fmt.Errorf("%w: %s", errInstallUnsupportedKind, label)
+	directoryName, ok := manifest.ContentDirectory(kind)
+	if ok {
+		return directoryName, nil
 	}
+
+	label := displayProjectType(kind)
+	if label == "-" {
+		label = "tipo de projeto desconhecido"
+	}
+
+	return "", fmt.Errorf("%w: %s", errInstallUnsupportedKind, label)
 }
 
 func wrapInstallDownloadError(err error, filename, directory string) error {
