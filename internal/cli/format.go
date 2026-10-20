@@ -60,6 +60,27 @@ func projectIdentifier(project modsource.Project) string {
 	return strings.TrimSpace(sanitizeText(project.ID))
 }
 
+func projectDisplayName(project modsource.Project) string {
+	if name := strings.TrimSpace(sanitizeText(project.Name)); name != "" {
+		return name
+	}
+	if identifier := projectIdentifier(project); identifier != "" {
+		return identifier
+	}
+
+	return "(sem nome)"
+}
+
+func versionDisplayLabel(version modsource.Version) string {
+	for _, value := range []string{version.VersionNumber, version.Name, version.ID} {
+		if trimmed := strings.TrimSpace(sanitizeText(value)); trimmed != "" {
+			return trimmed
+		}
+	}
+
+	return "-"
+}
+
 func summarizeValues(values []string, max int) string {
 	cleaned := make([]string, 0, len(values))
 	seen := make(map[string]struct{}, len(values))
@@ -167,4 +188,23 @@ func compactCount(value, divisor int64, suffix string) string {
 	formatted = strings.TrimSuffix(formatted, ".0")
 
 	return formatted + suffix
+}
+
+func formatBytes(size int64) string {
+	if size < 0 {
+		return "0 B"
+	}
+
+	const unit = 1024
+	if size < unit {
+		return fmt.Sprintf("%d B", size)
+	}
+
+	divisor, exponent := int64(unit), 0
+	for value := size / unit; value >= unit && exponent < len("KMGTPE")-1; value /= unit {
+		divisor *= unit
+		exponent++
+	}
+
+	return fmt.Sprintf("%.1f %cB", float64(size)/float64(divisor), "KMGTPE"[exponent])
 }

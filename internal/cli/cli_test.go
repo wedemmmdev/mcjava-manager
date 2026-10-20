@@ -40,7 +40,7 @@ func TestAppShowsHelpWithoutInstance(t *testing.T) {
 	if !strings.Contains(out.String(), "Usage:") {
 		t.Fatalf("help output = %q, want usage information", out.String())
 	}
-	for _, command := range []string{"search", "info", "versions"} {
+	for _, command := range []string{"search", "info", "versions", "install"} {
 		if !strings.Contains(out.String(), command) {
 			t.Fatalf("help output = %q, want the %s command", out.String(), command)
 		}
@@ -185,5 +185,45 @@ func TestExpandHome(t *testing.T) {
 				t.Fatalf("expandHome(%q) = %q, want %q", tt.path, got, tt.want)
 			}
 		})
+	}
+}
+
+func TestOptionsResolveInstanceUsesFlag(t *testing.T) {
+	t.Setenv("MCJAVA_MANAGER_INSTANCE", "./ambiente")
+
+	opts := &options{InstancePath: "./flag"}
+	got, err := opts.resolveInstance()
+	if err != nil {
+		t.Fatalf("resolveInstance() error = %v", err)
+	}
+	if filepath.Base(got) != "flag" {
+		t.Fatalf("resolveInstance() = %q, want flag path", got)
+	}
+}
+
+func TestOptionsResolveInstanceUsesEnvironment(t *testing.T) {
+	t.Setenv("MCJAVA_MANAGER_INSTANCE", "./ambiente")
+
+	got, err := (&options{}).resolveInstance()
+	if err != nil {
+		t.Fatalf("resolveInstance() error = %v", err)
+	}
+	if filepath.Base(got) != "ambiente" {
+		t.Fatalf("resolveInstance() = %q, want environment path", got)
+	}
+}
+
+func TestOptionsResolveInstanceRequiresPath(t *testing.T) {
+	t.Setenv("MCJAVA_MANAGER_INSTANCE", "")
+
+	_, err := (&options{}).resolveInstance()
+	if err == nil || !strings.Contains(err.Error(), "informe o caminho da instância") {
+		t.Fatalf("resolveInstance() error = %v, want missing path error", err)
+	}
+}
+
+func TestOptionsResolveInstanceNilOptions(t *testing.T) {
+	if _, err := (*options)(nil).resolveInstance(); err == nil {
+		t.Fatal("resolveInstance() on nil options should fail")
 	}
 }

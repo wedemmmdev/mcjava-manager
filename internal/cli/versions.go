@@ -191,17 +191,6 @@ func writeVersionsTable(out io.Writer, versions []modsource.Version, offset int)
 	}
 
 	for index, version := range versions {
-		label := strings.TrimSpace(version.VersionNumber)
-		if label == "" {
-			label = strings.TrimSpace(version.Name)
-		}
-		if label == "" {
-			label = version.ID
-		}
-		if label == "" {
-			label = "-"
-		}
-
 		fileLabel, err := versionFileLabel(version)
 		if err != nil {
 			return err
@@ -216,7 +205,7 @@ func writeVersionsTable(out io.Writer, versions []modsource.Version, offset int)
 			writer,
 			"%d\t%s\t%s\t%s\t%s\t%s\t%s\n",
 			offset+index+1,
-			truncate(label, 36),
+			truncate(versionDisplayLabel(version), 36),
 			displayChannel(version.Channel),
 			summarizeValues(version.GameVersions, 2),
 			summarizeValues(version.Loaders, 3),

@@ -62,15 +62,7 @@ provedor.`,
 func writeInfoResult(out io.Writer, provider modsource.Provider, project modsource.Project, includeDescription bool) error {
 	var builder strings.Builder
 
-	name := strings.TrimSpace(sanitizeText(project.Name))
-	if name == "" {
-		name = projectIdentifier(project)
-	}
-	if name == "" {
-		name = "(sem nome)"
-	}
-
-	fmt.Fprintf(&builder, "%s\n\n", name)
+	fmt.Fprintf(&builder, "%s\n\n", projectDisplayName(project))
 	fmt.Fprintf(&builder, "Tipo: %s\n", displayProjectType(project.Type))
 	fmt.Fprintf(&builder, "Provedor: %s\n", providerDisplayName(provider))
 	writeInfoField(&builder, "ID", sanitizeText(project.ID))

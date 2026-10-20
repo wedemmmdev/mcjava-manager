@@ -37,6 +37,7 @@ persistente --instance.`,
   mcjava-manager search sodium --loader fabric --game-version 1.20.1
   mcjava-manager info sodium
   mcjava-manager versions sodium --game-version 1.20.1 --loader fabric
+  mcjava-manager install sodium --instance ./fabric-loader-0.19.5-1.20.1 --game-version 1.20.1 --loader fabric
   mcjava-manager version`,
 		Args:          cobra.MaximumNArgs(1),
 		SilenceErrors: true,
@@ -65,6 +66,7 @@ persistente --instance.`,
 	cmd.AddCommand(newSearchCommand(nil))
 	cmd.AddCommand(newInfoCommand(nil))
 	cmd.AddCommand(newVersionsCommand(nil))
+	cmd.AddCommand(newInstallCommand(nil, opts, nil))
 
 	return cmd
 }
@@ -79,22 +81,49 @@ func (o *options) resolve(args []string) error {
 		o.InstancePath = args[0]
 	}
 
-	if o.InstancePath == "" {
-		o.InstancePath = os.Getenv("MCJAVA_MANAGER_INSTANCE")
-	}
 	if o.ConfigPath == "" {
 		o.ConfigPath = os.Getenv("MCJAVA_MANAGER_CONFIG")
 	}
 
 	var err error
-	if o.InstancePath, err = absolutePath(o.InstancePath); err != nil {
-		return fmt.Errorf("falha ao resolver o caminho da instância: %w", err)
+	if o.InstancePath, err = o.instancePath(); err != nil {
+		return err
 	}
 	if o.ConfigPath, err = absolutePath(o.ConfigPath); err != nil {
 		return fmt.Errorf("falha ao resolver o caminho da configuração: %w", err)
 	}
 
 	return nil
+}
+
+func (o *options) instancePath() (string, error) {
+	if o == nil {
+		return "", fmt.Errorf("opções da CLI não inicializadas")
+	}
+
+	path := o.InstancePath
+	if path == "" {
+		path = os.Getenv("MCJAVA_MANAGER_INSTANCE")
+	}
+
+	absolute, err := absolutePath(path)
+	if err != nil {
+		return "", fmt.Errorf("falha ao resolver o caminho da instância: %w", err)
+	}
+
+	return absolute, nil
+}
+
+func (o *options) resolveInstance() (string, error) {
+	path, err := o.instancePath()
+	if err != nil {
+		return "", err
+	}
+	if path == "" {
+		return "", fmt.Errorf("informe o caminho da instância com --instance ou defina MCJAVA_MANAGER_INSTANCE")
+	}
+
+	return path, nil
 }
 
 func absolutePath(path string) (string, error) {
