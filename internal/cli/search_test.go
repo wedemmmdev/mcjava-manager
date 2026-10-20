@@ -1,8 +1,6 @@
 package cli
 
 import (
-	"bytes"
-	"context"
 	"errors"
 	"reflect"
 	"strings"
@@ -12,61 +10,12 @@ import (
 	"github.com/wedemmmdev/mcjava-manager/pkg/modsource"
 )
 
-type fakeSearchClient struct {
-	provider    modsource.Provider
-	result      modsource.SearchResult
-	err         error
-	query       modsource.SearchQuery
-	searchCalls int
-}
-
-func (f *fakeSearchClient) Provider() modsource.Provider {
-	if f.provider == "" {
-		return modsource.ProviderModrinth
-	}
-
-	return f.provider
-}
-
-func (f *fakeSearchClient) Capabilities() modsource.Capabilities {
-	return modsource.Capabilities{MaxPageSize: 100}
-}
-
-func (f *fakeSearchClient) Search(_ context.Context, query modsource.SearchQuery) (modsource.SearchResult, error) {
-	f.searchCalls++
-	f.query = query
-
-	return f.result, f.err
-}
-
-func (f *fakeSearchClient) GetProject(context.Context, string) (modsource.Project, error) {
-	return modsource.Project{}, errors.New("GetProject não usado neste teste")
-}
-
-func (f *fakeSearchClient) ListVersions(context.Context, string, modsource.VersionFilter) ([]modsource.Version, error) {
-	return nil, errors.New("ListVersions não usado neste teste")
-}
-
-func (f *fakeSearchClient) GetVersion(context.Context, string) (modsource.Version, error) {
-	return modsource.Version{}, errors.New("GetVersion não usado neste teste")
-}
-
 func executeSearchCommand(t *testing.T, client modsource.Client, args ...string) (string, string, error) {
-	t.Helper()
-
-	cmd := newSearchCommand(client)
-	var out, errOut bytes.Buffer
-	cmd.SetOut(&out)
-	cmd.SetErr(&errOut)
-	cmd.SetArgs(args)
-
-	err := cmd.ExecuteContext(context.Background())
-
-	return out.String(), errOut.String(), err
+	return executeCommand(t, newSearchCommand(client), args...)
 }
 
 func TestSearchCommandBuildsQuery(t *testing.T) {
-	client := &fakeSearchClient{
+	client := &fakeProviderClient{
 		result: modsource.SearchResult{
 			Total:  12,
 			Offset: 10,
@@ -142,7 +91,7 @@ func TestSearchCommandBuildsQuery(t *testing.T) {
 }
 
 func TestSearchCommandDefaults(t *testing.T) {
-	client := &fakeSearchClient{
+	client := &fakeProviderClient{
 		result: modsource.SearchResult{Total: 0, Offset: 0, Limit: 20},
 	}
 
@@ -177,7 +126,7 @@ func TestSearchCommandDefaults(t *testing.T) {
 }
 
 func TestSearchCommandAcceptsCommaSeparatedCategories(t *testing.T) {
-	client := &fakeSearchClient{}
+	client := &fakeProviderClient{}
 
 	if _, _, err := executeSearchCommand(t, client, "sodium", "--category", "optimization,performance"); err != nil {
 		t.Fatalf("Execute() error = %v", err)
@@ -190,7 +139,7 @@ func TestSearchCommandAcceptsCommaSeparatedCategories(t *testing.T) {
 }
 
 func TestSearchCommandShowsNextPage(t *testing.T) {
-	client := &fakeSearchClient{
+	client := &fakeProviderClient{
 		result: modsource.SearchResult{
 			Total:  20,
 			Offset: 10,
@@ -215,7 +164,7 @@ func TestSearchCommandShowsNextPage(t *testing.T) {
 }
 
 func TestSearchCommandNoResults(t *testing.T) {
-	client := &fakeSearchClient{
+	client := &fakeProviderClient{
 		result: modsource.SearchResult{Total: 0, Offset: 0, Limit: 20},
 	}
 
@@ -240,37 +189,37 @@ func TestSearchCommandRejectsInvalidOptions(t *testing.T) {
 	}{
 		{
 			name:   "tipo inválido",
-			client: &fakeSearchClient{},
+			client: &fakeProviderClient{},
 			args:   []string{"sodium", "--type", "invalido"},
 			want:   "tipo de projeto inválido",
 		},
 		{
 			name:   "ordenação inválida",
-			client: &fakeSearchClient{},
+			client: &fakeProviderClient{},
 			args:   []string{"sodium", "--sort", "invalida"},
 			want:   "ordenação inválida",
 		},
 		{
 			name:   "limite zero",
-			client: &fakeSearchClient{},
+			client: &fakeProviderClient{},
 			args:   []string{"sodium", "--limit", "0"},
 			want:   "--limit deve estar entre 1 e 100",
 		},
 		{
 			name:   "limite acima do máximo",
-			client: &fakeSearchClient{},
+			client: &fakeProviderClient{},
 			args:   []string{"sodium", "--limit", "101"},
 			want:   "--limit deve estar entre 1 e 100",
 		},
 		{
 			name:   "offset negativo",
-			client: &fakeSearchClient{},
+			client: &fakeProviderClient{},
 			args:   []string{"sodium", "--offset", "-1"},
 			want:   "--offset não pode ser negativo",
 		},
 		{
 			name:   "provedor desconhecido",
-			client: &fakeSearchClient{},
+			client: &fakeProviderClient{},
 			args:   []string{"sodium", "--provider", "invalido"},
 			want:   "provedor desconhecido",
 		},
@@ -282,7 +231,7 @@ func TestSearchCommandRejectsInvalidOptions(t *testing.T) {
 		},
 		{
 			name:   "cliente de outro provedor",
-			client: &fakeSearchClient{provider: modsource.ProviderModrinth},
+			client: &fakeProviderClient{provider: modsource.ProviderModrinth},
 			args:   []string{"sodium", "--provider", "curseforge"},
 			want:   "cliente disponível",
 		},
@@ -290,7 +239,7 @@ func TestSearchCommandRejectsInvalidOptions(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			fake, _ := test.client.(*fakeSearchClient)
+			fake, _ := test.client.(*fakeProviderClient)
 
 			_, _, err := executeSearchCommand(t, test.client, test.args...)
 			if err == nil {
@@ -307,7 +256,7 @@ func TestSearchCommandRejectsInvalidOptions(t *testing.T) {
 }
 
 func TestSearchCommandReturnsAPIError(t *testing.T) {
-	client := &fakeSearchClient{
+	client := &fakeProviderClient{
 		err: &modsource.APIError{
 			Provider:   modsource.ProviderModrinth,
 			Operation:  "buscar projetos",
@@ -333,20 +282,42 @@ func TestSearchCommandReturnsAPIError(t *testing.T) {
 	}
 }
 
-func TestNewSearchClient(t *testing.T) {
-	client, err := newSearchClient(modsource.ProviderModrinth)
+func TestNewProviderClient(t *testing.T) {
+	client, err := newProviderClient(modsource.ProviderModrinth)
 	if err != nil {
-		t.Fatalf("newSearchClient(modrinth) error = %v", err)
+		t.Fatalf("newProviderClient(modrinth) error = %v", err)
 	}
 	if client.Provider() != modsource.ProviderModrinth {
 		t.Fatalf("Provider() = %q, want modrinth", client.Provider())
 	}
 
-	if _, err := newSearchClient(modsource.ProviderCurseForge); err == nil {
-		t.Fatal("newSearchClient(curseforge) error = nil, want an error")
+	if _, err := newProviderClient(modsource.ProviderCurseForge); err == nil {
+		t.Fatal("newProviderClient(curseforge) error = nil, want an error")
 	}
-	if _, err := newSearchClient(modsource.Provider("desconhecido")); err == nil {
-		t.Fatal("newSearchClient(desconhecido) error = nil, want an error")
+	if _, err := newProviderClient(modsource.Provider("desconhecido")); err == nil {
+		t.Fatal("newProviderClient(desconhecido) error = nil, want an error")
+	}
+}
+
+func TestResolveProviderClient(t *testing.T) {
+	injected := &fakeProviderClient{provider: modsource.ProviderModrinth}
+
+	client, err := resolveProviderClient(injected, "modrinth")
+	if err != nil {
+		t.Fatalf("resolveProviderClient() error = %v", err)
+	}
+	if client != injected {
+		t.Fatal("resolveProviderClient() should return the injected client")
+	}
+
+	if _, err := resolveProviderClient(injected, "curseforge"); err == nil {
+		t.Fatal("resolveProviderClient() with a different provider should fail")
+	}
+	if _, err := resolveProviderClient(nil, "curseforge"); err == nil {
+		t.Fatal("resolveProviderClient(curseforge) should fail while the adapter is unavailable")
+	}
+	if _, err := resolveProviderClient(nil, "desconhecido"); err == nil {
+		t.Fatal("resolveProviderClient(desconhecido) should fail")
 	}
 }
 
@@ -424,5 +395,17 @@ func TestSanitizeText(t *testing.T) {
 	}
 	if strings.ContainsRune(got, '\x1b') {
 		t.Fatal("sanitizeText() kept an escape character")
+	}
+}
+
+func TestSanitizeBlock(t *testing.T) {
+	got := sanitizeBlock("a\x1bb\nc\td\x7f\u202e")
+	want := "ab\nc\td"
+
+	if got != want {
+		t.Fatalf("sanitizeBlock() = %q, want %q", got, want)
+	}
+	if strings.ContainsRune(got, '\x1b') {
+		t.Fatal("sanitizeBlock() kept an escape character")
 	}
 }

@@ -35,6 +35,8 @@ persistente --instance.`,
 		Example: `  mcjava-manager ./fabric-loader-0.19.5-1.20.1
   mcjava-manager --instance ./fabric-loader-0.19.5-1.20.1 version
   mcjava-manager search sodium --loader fabric --game-version 1.20.1
+  mcjava-manager info sodium
+  mcjava-manager versions sodium --game-version 1.20.1 --loader fabric
   mcjava-manager version`,
 		Args:          cobra.MaximumNArgs(1),
 		SilenceErrors: true,
@@ -61,6 +63,8 @@ persistente --instance.`,
 	cmd.SetVersionTemplate("mcjava-manager {{.Version}}\n")
 	cmd.AddCommand(newVersionCommand())
 	cmd.AddCommand(newSearchCommand(nil))
+	cmd.AddCommand(newInfoCommand(nil))
+	cmd.AddCommand(newVersionsCommand(nil))
 
 	return cmd
 }

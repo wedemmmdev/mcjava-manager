@@ -3,13 +3,11 @@ package cli
 import (
 	"fmt"
 	"io"
-	"strconv"
 	"strings"
 	"text/tabwriter"
 
 	"github.com/spf13/cobra"
 
-	"github.com/wedemmmdev/mcjava-manager/internal/version"
 	"github.com/wedemmmdev/mcjava-manager/pkg/modrinth"
 	"github.com/wedemmmdev/mcjava-manager/pkg/modsource"
 )
@@ -53,19 +51,9 @@ em destaque para os filtros informados.`,
 				return err
 			}
 
-			provider, err := modsource.ParseProvider(opts.provider)
+			searchClient, err := resolveProviderClient(client, opts.provider)
 			if err != nil {
 				return err
-			}
-
-			searchClient := client
-			if searchClient == nil {
-				searchClient, err = newSearchClient(provider)
-				if err != nil {
-					return err
-				}
-			} else if searchClient.Provider() != provider {
-				return fmt.Errorf("o cliente disponível é do provedor %q, mas --provider=%q foi solicitado", searchClient.Provider(), provider)
 			}
 
 			result, err := searchClient.Search(cmd.Context(), query)
@@ -158,26 +146,8 @@ func parseSort(value string) (modsource.SortBy, error) {
 	}
 }
 
-func newSearchClient(provider modsource.Provider) (modsource.Client, error) {
-	switch provider {
-	case modsource.ProviderModrinth:
-		return modrinth.New(modrinth.WithUserAgent(searchUserAgent())), nil
-	case modsource.ProviderCurseForge:
-		return nil, fmt.Errorf("o provedor CurseForge ainda não está implementado")
-	default:
-		return nil, fmt.Errorf("provedor %q não suportado", provider)
-	}
-}
-
-func searchUserAgent() string {
-	return fmt.Sprintf("mcjava-manager/%s (https://github.com/wedemmmdev/mcjava-manager)", version.Short())
-}
-
 func writeSearchResult(out io.Writer, provider modsource.Provider, query modsource.SearchQuery, result modsource.SearchResult) error {
-	providerName := provider.DisplayName()
-	if providerName == "" {
-		providerName = string(provider)
-	}
+	providerName := providerDisplayName(provider)
 
 	resultLabel := "resultados"
 	if result.Total == 1 {
@@ -256,99 +226,4 @@ func writeSearchTable(out io.Writer, result modsource.SearchResult) error {
 	}
 
 	return nil
-}
-
-func displayProjectType(kind modsource.ProjectKind) string {
-	if kind == "" {
-		return "-"
-	}
-	if display := kind.DisplayName(); display != "" {
-		return sanitizeText(display)
-	}
-
-	return sanitizeText(string(kind))
-}
-
-func authorsText(authors []string) string {
-	values := make([]string, 0, len(authors))
-	for _, author := range authors {
-		if trimmed := strings.TrimSpace(sanitizeText(author)); trimmed != "" {
-			values = append(values, trimmed)
-		}
-	}
-	if len(values) == 0 {
-		return "-"
-	}
-
-	return strings.Join(values, ", ")
-}
-
-func projectIdentifier(project modsource.Project) string {
-	if slug := strings.TrimSpace(sanitizeText(project.Slug)); slug != "" {
-		return slug
-	}
-
-	return strings.TrimSpace(sanitizeText(project.ID))
-}
-
-func truncate(value string, max int) string {
-	value = strings.TrimSpace(sanitizeText(value))
-	if max <= 0 {
-		return ""
-	}
-
-	runes := []rune(value)
-	if len(runes) <= max {
-		return value
-	}
-	if max == 1 {
-		return string(runes[:1])
-	}
-
-	return string(runes[:max-1]) + "…"
-}
-
-// sanitizeText removes control and bidirectional-override characters from
-// untrusted provider data before it is written to the terminal.
-func sanitizeText(value string) string {
-	return strings.Map(func(r rune) rune {
-		switch {
-		case r == '\n' || r == '\r' || r == '\t':
-			return ' '
-		case r < 0x20 || r == 0x7f:
-			return -1
-		case r >= 0x80 && r <= 0x9f:
-			return -1
-		case r >= 0x202a && r <= 0x202e:
-			return -1
-		case r >= 0x2066 && r <= 0x2069:
-			return -1
-		default:
-			return r
-		}
-	}, value)
-}
-
-func formatCount(value int64) string {
-	if value < 0 {
-		return "0"
-	}
-
-	switch {
-	case value < 1_000:
-		return strconv.FormatInt(value, 10)
-	case value < 1_000_000:
-		return compactCount(value, 1_000, "K")
-	case value < 1_000_000_000:
-		return compactCount(value, 1_000_000, "M")
-	default:
-		return compactCount(value, 1_000_000_000, "B")
-	}
-}
-
-func compactCount(value, divisor int64, suffix string) string {
-	formatted := strconv.FormatFloat(float64(value)/float64(divisor), 'f', 1, 64)
-	formatted = strings.TrimSuffix(formatted, ".0")
-
-	return formatted + suffix
 }
