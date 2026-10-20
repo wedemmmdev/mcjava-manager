@@ -40,6 +40,9 @@ func TestAppShowsHelpWithoutInstance(t *testing.T) {
 	if !strings.Contains(out.String(), "Usage:") {
 		t.Fatalf("help output = %q, want usage information", out.String())
 	}
+	if !strings.Contains(out.String(), "search") {
+		t.Fatalf("help output = %q, want the search command", out.String())
+	}
 }
 
 func TestAppVersionFlag(t *testing.T) {

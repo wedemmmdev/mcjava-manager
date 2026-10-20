@@ -34,6 +34,7 @@ A instância pode ser informada como argumento posicional ou pela flag
 persistente --instance.`,
 		Example: `  mcjava-manager ./fabric-loader-0.19.5-1.20.1
   mcjava-manager --instance ./fabric-loader-0.19.5-1.20.1 version
+  mcjava-manager search sodium --loader fabric --game-version 1.20.1
   mcjava-manager version`,
 		Args:          cobra.MaximumNArgs(1),
 		SilenceErrors: true,
@@ -59,6 +60,7 @@ persistente --instance.`,
 
 	cmd.SetVersionTemplate("mcjava-manager {{.Version}}\n")
 	cmd.AddCommand(newVersionCommand())
+	cmd.AddCommand(newSearchCommand(nil))
 
 	return cmd
 }
