@@ -54,7 +54,7 @@ persistente --instance.`,
 				return cmd.Help()
 			}
 
-			return fmt.Errorf("a interface interativa ainda não está disponível; use --help para ver os comandos")
+			return a.runTUI(cmd.Context(), opts)
 		},
 	}
 
