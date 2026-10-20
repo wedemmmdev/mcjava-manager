@@ -179,9 +179,7 @@ func (a *App) runTUI(ctx context.Context, opts *options) error {
 		return err
 	}
 
-	if opts.NoColor {
-		lipgloss.SetColorProfile(termenv.Ascii)
-	}
+	configureTUIColorProfile(opts.NoColor)
 
 	model := newTUIModel(
 		ctx,
@@ -202,6 +200,19 @@ func (a *App) runTUI(ctx context.Context, opts *options) error {
 	_, err = program.Run()
 
 	return err
+}
+
+// configureTUIColorProfile forces the TUI to True Color (24-bit), regardless of
+// the terminal environment. This keeps the theme consistent on Android/Shizuku
+// environments that report limited or missing color capabilities. The explicit
+// --no-color flag still disables color output.
+func configureTUIColorProfile(noColor bool) {
+	if noColor {
+		lipgloss.SetColorProfile(termenv.Ascii)
+		return
+	}
+
+	lipgloss.SetColorProfile(termenv.TrueColor)
 }
 
 func newTUIModel(

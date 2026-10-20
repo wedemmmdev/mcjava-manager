@@ -465,7 +465,7 @@ Foi passado um arquivo em vez de uma pasta. Informe o diretório.
 
 ### O aplicativo não abre a TUI
 
-A TUI só é aberta quando uma instância é informada. Sem `--instance` nem argumento posicional, o comando raiz mostra a ajuda. Confirme também que o terminal é interativo e tem suporte a cores; use `--no-color` se a renderização estiver estranha.
+A TUI só é aberta quando uma instância é informada. Sem `--instance` nem argumento posicional, o comando raiz mostra a ajuda. Confirme também que o terminal é interativo. A TUI força True Color (24-bit) independentemente de `TERM` ou `COLORTERM`; use `--no-color` se a renderização estiver estranha.
 
 ### Erro de rede ou TLS
 

@@ -13,6 +13,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/muesli/termenv"
 
 	"github.com/wedemmmdev/mcjava-manager/internal/download"
 	"github.com/wedemmmdev/mcjava-manager/internal/instance"
@@ -629,5 +630,27 @@ func TestTUIViewRendersTabsAndHelp(t *testing.T) {
 	help := model.View()
 	if !strings.Contains(help, "Ajuda") {
 		t.Fatalf("help view = %q", help)
+	}
+}
+
+func TestTUIForcesTrueColorProfile(t *testing.T) {
+	previous := lipgloss.ColorProfile()
+	t.Cleanup(func() {
+		lipgloss.SetColorProfile(previous)
+	})
+
+	configureTUIColorProfile(false)
+	if got := lipgloss.ColorProfile(); got != termenv.TrueColor {
+		t.Fatalf("lipgloss.ColorProfile() = %v, want %v", got, termenv.TrueColor)
+	}
+
+	model := newTUITestModel(t, &fakeProviderClient{}, nil)
+	if view := model.View(); !strings.Contains(view, "\x1b[38;2;") {
+		t.Fatalf("TUI view does not contain a 24-bit foreground color:\n%q", view)
+	}
+
+	configureTUIColorProfile(true)
+	if got := lipgloss.ColorProfile(); got != termenv.Ascii {
+		t.Fatalf("lipgloss.ColorProfile() = %v, want %v", got, termenv.Ascii)
 	}
 }

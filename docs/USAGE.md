@@ -445,6 +445,8 @@ mcjava-manager --instance /caminho/da/instancia
 
 A instância é preparada no início: as pastas `mods/`, `shaderpacks/`, `resourcepacks/` e `saves/` são criadas se necessário.
 
+A TUI força o perfil **True Color (24-bit)**, independentemente de `TERM`, `COLORTERM` ou das capacidades informadas pelo terminal. Isso mantém o tema roxo consistente em PCs, Termux e Shizuku. Use `--no-color` para desativar as cores explicitamente.
+
 ### Telas
 
 - **Buscar (F1):** campos de busca, versão do Minecraft, loader, tipo e canal; lista de resultados. O seletor **Tipo** oferece Todos, Mod, Shader e Pacote de recursos; **Canal** oferece release, beta, alpha e todos.

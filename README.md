@@ -42,6 +42,7 @@ Não há validação baseada no nome do loader ou no nome da pasta da instância
 
 - **CLI completa:** busca, metadados, versões, instalação, listagem, atualização e remoção.
 - **TUI com Bubble Tea:** busca, navegação por projetos e versões, instalação, atualização, verificação, remoção e detalhes do conteúdo instalado.
+- **True Color consistente:** a TUI força 24-bit mesmo em Termux/Shizuku; `--no-color` desativa as cores explicitamente.
 - **Seleção de versão compatível:** filtros por versão do Minecraft, loader e canal (`release`, `beta`, `alpha`).
 - **Versão exata:** instalação de um ID de versão específico com `--version`.
 - **Dependências obrigatórias:** resolução recursiva, com detecção de ciclos e limite de profundidade.
