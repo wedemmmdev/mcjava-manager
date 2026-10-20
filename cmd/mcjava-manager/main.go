@@ -9,7 +9,7 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/wedemmm/mcjava-manager/internal/cli"
+	"github.com/wedemmmdev/mcjava-manager/internal/cli"
 )
 
 func main() {

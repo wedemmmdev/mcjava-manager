@@ -90,6 +90,30 @@ func TestOptionsResolveAcceptsRepeatedInstance(t *testing.T) {
 	}
 }
 
+func TestOptionsResolveDoesNotValidateLoaderNames(t *testing.T) {
+	t.Setenv("MCJAVA_MANAGER_INSTANCE", "")
+	t.Setenv("MCJAVA_MANAGER_CONFIG", "")
+
+	names := []string{
+		"minha-instancia",
+		"qualquer pasta 1.20.1",
+		"fabric-nao-e-requisito",
+		"servidor-de-amigos",
+	}
+
+	for _, name := range names {
+		t.Run(name, func(t *testing.T) {
+			opts := &options{}
+			if err := opts.resolve([]string{name}); err != nil {
+				t.Fatalf("resolve() error = %v, want nil for an arbitrary directory name", err)
+			}
+			if filepath.Base(opts.InstancePath) != name {
+				t.Fatalf("InstancePath = %q, want base %q", opts.InstancePath, name)
+			}
+		})
+	}
+}
+
 func TestOptionsResolveEnvironment(t *testing.T) {
 	t.Setenv("MCJAVA_MANAGER_INSTANCE", "./instancia-do-ambiente")
 	t.Setenv("MCJAVA_MANAGER_CONFIG", "./config-do-ambiente.yaml")

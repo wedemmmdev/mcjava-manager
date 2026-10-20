@@ -1,0 +1,8 @@
+# Exemplo de configuração do mcjava-manager.
+#
+# Copie este arquivo para ~/.mcjava-manager.yaml e substitua o valor abaixo.
+# Em sistemas Unix, restrinja o acesso: chmod 600 ~/.mcjava-manager.yaml
+#
+# Em CI ou scripts, prefira a variável de ambiente CURSEFORGE_API_KEY.
+curseforge:
+  api_key: "SUA_CHAVE_AQUI"

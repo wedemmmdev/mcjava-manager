@@ -15,7 +15,7 @@ const (
 
 // These variables are overridden with -ldflags, for example:
 //
-//	-X github.com/wedemmm/mcjava-manager/internal/version.Version=v0.1.0
+//	-X github.com/wedemmmdev/mcjava-manager/internal/version.Version=v0.1.0
 var (
 	Version   = devVersion
 	Commit    = unknownCommit

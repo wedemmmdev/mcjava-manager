@@ -9,7 +9,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/wedemmm/mcjava-manager/internal/version"
+	"github.com/wedemmmdev/mcjava-manager/internal/version"
 )
 
 // options contains the global flags shared by every command.
