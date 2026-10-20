@@ -310,11 +310,20 @@ Os clientes HTTP do binário usam resolvedores públicos (`8.8.8.8:53` e `1.1.1.
    rish -c "chmod +x /data/local/tmp/mcjava-manager"
    ```
 
-4. Execute o programa pelo Shizuku, passando o caminho absoluto da instância:
+4. Para comandos CLI, execute o programa pelo Shizuku passando o caminho absoluto da instância:
 
    ```bash
-   rish -c "/data/local/tmp/mcjava-manager --instance /sdcard/Android/data/nome.do.seu.launcher/files/sua_instancia"
+   rish -c "/data/local/tmp/mcjava-manager --instance /sdcard/Android/data/nome.do.seu.launcher/files/sua_instancia list"
    ```
+
+5. Para abrir a TUI, entre no shell interativo do Shizuku. O `rish -c` não encaminha a entrada do terminal, então a TUI não recebe teclas:
+
+   ```bash
+   rish
+   /data/local/tmp/mcjava-manager --instance /sdcard/Android/data/nome.do.seu.launcher/files/sua_instancia
+   ```
+
+   A TUI força True Color (24-bit), independentemente de `TERM`, `COLORTERM` ou do ambiente do `rish`. Use `--no-color` para desativar as cores.
 
 > **Atenção:** sempre que atualizar o aplicativo — por exemplo, após um novo `git pull` e uma nova compilação — repita a cópia do binário para `/data/local/tmp/` e o `chmod +x`. O Shizuku executa a cópia que está em `/data/local/tmp/`, não o binário instalado em `$PREFIX/bin`.
 
