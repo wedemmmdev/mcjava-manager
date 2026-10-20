@@ -290,6 +290,8 @@ Em algumas instalações, o Termux não consegue acessar ou executar arquivos em
 
 Para contornar essa restrição, copie o binário para `/data/local/tmp/`, que permite execução nativa pelo usuário do Shizuku.
 
+O binário tenta primeiro o DNS configurado no sistema. Se a conexão com esse DNS falhar, ele usa `8.8.8.8:53` e `1.1.1.1:53` como fallback, evitando o erro de `connection refused` no ambiente do Shizuku.
+
 1. Copie o binário do Termux para uma pasta pública:
 
    ```bash

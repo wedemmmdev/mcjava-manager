@@ -52,6 +52,7 @@ Não há validação baseada no nome do loader ou no nome da pasta da instância
 - **Proteção contra sobrescrita silenciosa:** arquivos não rastreados exigem `--overwrite`; dependências em versão diferente são recusadas na instalação.
 - **Paginação:** `search` e `versions` aceitam `--limit` e `--offset`.
 - **Multiplataforma:** Linux, macOS, Windows, WSL e Termux/Android.
+- **Fallback DNS:** usa o DNS do sistema e recorre a resolvedores públicos quando ele está inacessível, como no Shizuku/Android.
 - **Mensagens de permissão contextuais:** orientação específica para Windows, macOS, Linux e Termux.
 - **Autocompletar de shell:** comandos de conclusão gerados pelo Cobra para Bash, Zsh, Fish e PowerShell.
 - **Sem ferramentas externas:** o download e a manipulação de arquivos usam a biblioteca padrão do Go.
@@ -314,6 +315,7 @@ internal/config/      Configuração local e resolução segura de credenciais
 internal/download/    Download HTTP, checksums, nomes seguros e escrita atômica
 internal/instance/    Validação da instância, pastas e erros de permissão
 internal/manifest/    Manifesto JSON versionado e persistência atômica
+internal/netdns/      Resolver DNS com fallback para ambientes restritos
 internal/version/     Metadados de build
 pkg/modsource/        Interfaces e tipos independentes de provedor
 pkg/modrinth/         Cliente da API v2 do Modrinth
