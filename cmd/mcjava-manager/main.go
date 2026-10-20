@@ -10,14 +10,7 @@ import (
 	"os/signal"
 
 	"github.com/wedemmmdev/mcjava-manager/internal/cli"
-	"github.com/wedemmmdev/mcjava-manager/internal/netdns"
 )
-
-func init() {
-	// Android/Shizuku may not allow the Go resolver to reach the system DNS
-	// configuration, so configure public DNS fallbacks before any network use.
-	netdns.Install()
-}
 
 func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)

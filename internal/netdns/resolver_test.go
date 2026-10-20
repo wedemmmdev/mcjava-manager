@@ -6,6 +6,7 @@ import (
 	"net"
 	"slices"
 	"testing"
+	"time"
 )
 
 func TestDialWithFallbackUsesSystemResolverFirst(t *testing.T) {
@@ -161,22 +162,67 @@ func TestNewResolverUsesGoResolver(t *testing.T) {
 	}
 }
 
-func TestInstallReplacesDefaultResolver(t *testing.T) {
-	previous := net.DefaultResolver
-	t.Cleanup(func() {
-		net.DefaultResolver = previous
+func TestNewDialerUsesFallbackResolver(t *testing.T) {
+	dialer := newDialer()
+
+	if dialer.Timeout != dialTimeout {
+		t.Fatalf("newDialer().Timeout = %v, want %v", dialer.Timeout, dialTimeout)
+	}
+	if dialer.KeepAlive != keepAlive {
+		t.Fatalf("newDialer().KeepAlive = %v, want %v", dialer.KeepAlive, keepAlive)
+	}
+	if dialer.Resolver == nil {
+		t.Fatal("newDialer().Resolver = nil, want a resolver")
+	}
+	if !dialer.Resolver.PreferGo {
+		t.Fatal("newDialer().Resolver.PreferGo = false, want true")
+	}
+	if dialer.Resolver.Dial == nil {
+		t.Fatal("newDialer().Resolver.Dial = nil, want a dial function")
+	}
+}
+
+func TestNewTransportConfiguresHTTPTransport(t *testing.T) {
+	transport := NewTransport()
+
+	if transport.DialContext == nil {
+		t.Fatal("NewTransport().DialContext = nil, want a dial function")
+	}
+	if !transport.ForceAttemptHTTP2 {
+		t.Fatal("NewTransport().ForceAttemptHTTP2 = false, want true")
+	}
+	if transport.MaxIdleConns != 100 {
+		t.Fatalf("NewTransport().MaxIdleConns = %d, want 100", transport.MaxIdleConns)
+	}
+	if transport.IdleConnTimeout != 90*time.Second {
+		t.Fatalf("NewTransport().IdleConnTimeout = %v, want 90s", transport.IdleConnTimeout)
+	}
+	if transport.TLSHandshakeTimeout != 10*time.Second {
+		t.Fatalf("NewTransport().TLSHandshakeTimeout = %v, want 10s", transport.TLSHandshakeTimeout)
+	}
+	if transport.ExpectContinueTimeout != time.Second {
+		t.Fatalf("NewTransport().ExpectContinueTimeout = %v, want 1s", transport.ExpectContinueTimeout)
+	}
+}
+
+func TestNewTransportUsesProvidedDialer(t *testing.T) {
+	var calls []string
+	conn := newTestConn(t)
+
+	transport := newTransport(func(_ context.Context, network, address string) (net.Conn, error) {
+		calls = append(calls, network+" "+address)
+		return conn, nil
 	})
 
-	Install()
-
-	if net.DefaultResolver == previous {
-		t.Fatal("Install() did not replace net.DefaultResolver")
+	got, err := transport.DialContext(context.Background(), "udp", googlePublicDNS)
+	if err != nil {
+		t.Fatalf("transport.DialContext() error = %v", err)
 	}
-	if !net.DefaultResolver.PreferGo {
-		t.Fatal("net.DefaultResolver.PreferGo = false, want true")
+	if got != conn {
+		t.Fatal("transport.DialContext() returned a different connection")
 	}
-	if net.DefaultResolver.Dial == nil {
-		t.Fatal("net.DefaultResolver.Dial = nil, want a dial function")
+	if want := []string{"udp " + googlePublicDNS}; !slices.Equal(calls, want) {
+		t.Fatalf("dial calls = %v, want %v", calls, want)
 	}
 }
 

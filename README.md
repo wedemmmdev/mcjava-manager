@@ -52,7 +52,7 @@ Não há validação baseada no nome do loader ou no nome da pasta da instância
 - **Proteção contra sobrescrita silenciosa:** arquivos não rastreados exigem `--overwrite`; dependências em versão diferente são recusadas na instalação.
 - **Paginação:** `search` e `versions` aceitam `--limit` e `--offset`.
 - **Multiplataforma:** Linux, macOS, Windows, WSL e Termux/Android.
-- **Fallback DNS:** usa o DNS do sistema e recorre a resolvedores públicos quando ele está inacessível, como no Shizuku/Android.
+- **Fallback DNS:** os clientes HTTP usam o DNS do sistema e recorrem a resolvedores públicos quando ele está inacessível, como no Shizuku/Android.
 - **Mensagens de permissão contextuais:** orientação específica para Windows, macOS, Linux e Termux.
 - **Autocompletar de shell:** comandos de conclusão gerados pelo Cobra para Bash, Zsh, Fish e PowerShell.
 - **Sem ferramentas externas:** o download e a manipulação de arquivos usam a biblioteca padrão do Go.

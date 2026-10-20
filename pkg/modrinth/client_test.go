@@ -188,6 +188,9 @@ func TestNewDefaults(t *testing.T) {
 	if client.httpClient.Timeout != DefaultTimeout {
 		t.Errorf("timeout = %s, esperado %s", client.httpClient.Timeout, DefaultTimeout)
 	}
+	if client.httpClient.Transport == nil {
+		t.Error("transport = nil, esperado transporte com DNS de fallback")
+	}
 }
 
 func TestOptions(t *testing.T) {
@@ -211,6 +214,9 @@ func TestOptions(t *testing.T) {
 	zeroTimeout := New(WithHTTPClient(&http.Client{}))
 	if zeroTimeout.httpClient.Timeout != DefaultTimeout {
 		t.Errorf("timeout padrão = %s, esperado %s", zeroTimeout.httpClient.Timeout, DefaultTimeout)
+	}
+	if zeroTimeout.httpClient.Transport == nil {
+		t.Error("transport com cliente HTTP vazio = nil, esperado fallback DNS")
 	}
 
 	nilClient := New(WithHTTPClient(nil))

@@ -1,6 +1,6 @@
-// Package netdns configures a resilient DNS resolver for restricted
-// environments such as Android/Shizuku, where the system-provided resolver may
-// point to an inaccessible loopback address.
+// Package netdns provides HTTP transports with a resilient DNS resolver for
+// restricted environments such as Android/Shizuku, where the system-provided
+// resolver may point to an inaccessible loopback address.
 package netdns
 
 import (
@@ -8,23 +8,34 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"net/http"
 	"time"
 )
 
 const (
 	googlePublicDNS     = "8.8.8.8:53"
 	cloudflarePublicDNS = "1.1.1.1:53"
-	dialTimeout         = 5 * time.Second
+
+	dnsDialTimeout = 5 * time.Second
+	dialTimeout    = 30 * time.Second
+	keepAlive      = 30 * time.Second
 )
 
 type dialFunc func(ctx context.Context, network, address string) (net.Conn, error)
 
-// Install replaces net.DefaultResolver with a resolver that tries the
-// system-provided DNS server first and falls back to public resolvers when it
-// is unreachable.
-func Install() {
-	dialer := &net.Dialer{Timeout: dialTimeout}
-	net.DefaultResolver = newResolver(dialer.DialContext)
+// NewTransport returns an HTTP transport based on http.DefaultTransport that
+// tries the system-provided DNS server first and falls back to public
+// resolvers when it is unreachable.
+func NewTransport() *http.Transport {
+	return newTransport(newDialer().DialContext)
+}
+
+func newDialer() *net.Dialer {
+	return &net.Dialer{
+		Timeout:   dialTimeout,
+		KeepAlive: keepAlive,
+		Resolver:  newResolver((&net.Dialer{Timeout: dnsDialTimeout}).DialContext),
+	}
 }
 
 func newResolver(dial dialFunc) *net.Resolver {
@@ -34,6 +45,24 @@ func newResolver(dial dialFunc) *net.Resolver {
 			return dialWithFallback(ctx, network, address, dial)
 		},
 	}
+}
+
+func newTransport(dial dialFunc) *http.Transport {
+	transport, ok := http.DefaultTransport.(*http.Transport)
+	if !ok {
+		transport = &http.Transport{}
+	} else {
+		transport = transport.Clone()
+	}
+
+	transport.DialContext = dial
+	transport.ForceAttemptHTTP2 = true
+	transport.MaxIdleConns = 100
+	transport.IdleConnTimeout = 90 * time.Second
+	transport.TLSHandshakeTimeout = 10 * time.Second
+	transport.ExpectContinueTimeout = 1 * time.Second
+
+	return transport
 }
 
 func dialWithFallback(ctx context.Context, network, address string, dial dialFunc) (net.Conn, error) {

@@ -13,6 +13,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/wedemmmdev/mcjava-manager/internal/netdns"
 	"github.com/wedemmmdev/mcjava-manager/pkg/modsource"
 )
 
@@ -51,9 +52,12 @@ type Option func(*Client)
 // New creates a Modrinth client with safe defaults.
 func New(opts ...Option) *Client {
 	client := &Client{
-		baseURL:    DefaultBaseURL,
-		httpClient: &http.Client{Timeout: DefaultTimeout},
-		userAgent:  DefaultUserAgent,
+		baseURL: DefaultBaseURL,
+		httpClient: &http.Client{
+			Transport: netdns.NewTransport(),
+			Timeout:   DefaultTimeout,
+		},
+		userAgent: DefaultUserAgent,
 	}
 
 	for _, opt := range opts {
@@ -82,8 +86,13 @@ func WithHTTPClient(httpClient *http.Client) Option {
 			return
 		}
 
+		transport := httpClient.Transport
+		if transport == nil {
+			transport = netdns.NewTransport()
+		}
+
 		copy := &http.Client{
-			Transport:     httpClient.Transport,
+			Transport:     transport,
 			CheckRedirect: httpClient.CheckRedirect,
 			Jar:           httpClient.Jar,
 			Timeout:       httpClient.Timeout,

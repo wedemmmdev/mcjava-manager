@@ -589,6 +589,9 @@ func TestNewDefaults(t *testing.T) {
 	if client.httpClient.Timeout != DefaultTimeout {
 		t.Errorf("timeout = %s, want %s", client.httpClient.Timeout, DefaultTimeout)
 	}
+	if client.httpClient.Transport == nil {
+		t.Error("transport = nil, want a transport with DNS fallback")
+	}
 	if client.userAgent != DefaultUserAgent {
 		t.Errorf("userAgent = %q, want %q", client.userAgent, DefaultUserAgent)
 	}
