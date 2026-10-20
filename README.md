@@ -97,7 +97,7 @@ $env:Path += ";$env:USERPROFILE\go\bin"
 ```bash
 git clone https://github.com/wedemmmdev/mcjava-manager.git
 cd mcjava-manager
-CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o mcjava-manager ./cmd/mcjava-manager
+CGO_ENABLED=0 go build -buildvcs=false -trimpath -ldflags="-s -w" -o mcjava-manager ./cmd/mcjava-manager
 ```
 
 No Windows (PowerShell):
@@ -106,7 +106,7 @@ No Windows (PowerShell):
 git clone https://github.com/wedemmmdev/mcjava-manager.git
 cd mcjava-manager
 $env:CGO_ENABLED = "0"
-go build -trimpath -ldflags="-s -w" -o mcjava-manager.exe .\cmd\mcjava-manager
+go build -buildvcs=false -trimpath -ldflags="-s -w" -o mcjava-manager.exe .\cmd\mcjava-manager
 ```
 
 O projeto ainda não publica releases binárias oficiais. As instruções completas para cada plataforma, incluindo Termux, macOS, Windows e compilação cruzada, estão em [docs/INSTALL.md](docs/INSTALL.md).
@@ -341,14 +341,14 @@ go test -race ./...
 Build estático:
 
 ```bash
-CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o mcjava-manager ./cmd/mcjava-manager
+CGO_ENABLED=0 go build -buildvcs=false -trimpath -ldflags="-s -w" -o mcjava-manager ./cmd/mcjava-manager
 ```
 
 Build cruzado para Windows:
 
 ```bash
 CGO_ENABLED=0 GOOS=windows GOARCH=amd64 \
-  go build -trimpath -ldflags="-s -w" -o mcjava-manager.exe ./cmd/mcjava-manager
+  go build -buildvcs=false -trimpath -ldflags="-s -w" -o mcjava-manager.exe ./cmd/mcjava-manager
 ```
 
 Os testes de clientes HTTP usam `httptest.Server` e não dependem da API real. Contribuições devem seguir Conventional Commits, manter o código formatado e incluir testes para lógica crítica.

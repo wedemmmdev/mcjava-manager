@@ -45,7 +45,7 @@ Normalmente o caminho é `~/go/bin` em Linux/macOS e `%USERPROFILE%\go\bin` no W
 ```bash
 git clone https://github.com/wedemmmdev/mcjava-manager.git
 cd mcjava-manager
-CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o mcjava-manager ./cmd/mcjava-manager
+CGO_ENABLED=0 go build -buildvcs=false -trimpath -ldflags="-s -w" -o mcjava-manager ./cmd/mcjava-manager
 ```
 
 Com `CGO_ENABLED=0`, o resultado não depende de bibliotecas C externas e é adequado para distribuição como binário único.
@@ -53,7 +53,7 @@ Com `CGO_ENABLED=0`, o resultado não depende de bibliotecas C externas e é ade
 Para builds de desenvolvimento com metadados de versão:
 
 ```bash
-CGO_ENABLED=0 go build -trimpath -ldflags="-s -w \
+CGO_ENABLED=0 go build -buildvcs=false -trimpath -ldflags="-s -w \
   -X github.com/wedemmmdev/mcjava-manager/internal/version.Version=dev" \
   -o mcjava-manager ./cmd/mcjava-manager
 ```
@@ -68,7 +68,7 @@ O repositório ainda não publica releases binárias oficiais. Até que isso exi
 
 ```bash
 mkdir -p "$HOME/.local/bin"
-CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" \
+CGO_ENABLED=0 go build -buildvcs=false -trimpath -ldflags="-s -w" \
   -o "$HOME/.local/bin/mcjava-manager" ./cmd/mcjava-manager
 ```
 
@@ -111,7 +111,7 @@ Em um build estático, `file` mostra `statically linked` e `ldd` informa que o b
 Para Raspberry Pi e outros sistemas ARM, compile na própria máquina:
 
 ```bash
-CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o mcjava-manager ./cmd/mcjava-manager
+CGO_ENABLED=0 go build -buildvcs=false -trimpath -ldflags="-s -w" -o mcjava-manager ./cmd/mcjava-manager
 ```
 
 Ou faça compilação cruzada com `GOARCH=arm64` ou `GOARCH=arm`.
@@ -136,7 +136,7 @@ source ~/.zshrc
 ```bash
 git clone https://github.com/wedemmmdev/mcjava-manager.git
 cd mcjava-manager
-CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o mcjava-manager ./cmd/mcjava-manager
+CGO_ENABLED=0 go build -buildvcs=false -trimpath -ldflags="-s -w" -o mcjava-manager ./cmd/mcjava-manager
 ```
 
 Em Macs com Apple Silicon, o build nativo gera `arm64`. Para um Mac Intel, use `GOARCH=amd64` se estiver compilando em outra máquina.
@@ -180,7 +180,7 @@ Para tornar a alteração permanente, use a interface de **Variáveis de Ambient
 git clone https://github.com/wedemmmdev/mcjava-manager.git
 cd mcjava-manager
 $env:CGO_ENABLED = "0"
-go build -trimpath -ldflags="-s -w" -o mcjava-manager.exe .\cmd\mcjava-manager
+go build -buildvcs=false -trimpath -ldflags="-s -w" -o mcjava-manager.exe .\cmd\mcjava-manager
 ```
 
 Execute no PowerShell, no Prompt de Comando ou no Windows Terminal:
@@ -215,7 +215,7 @@ No WSL, use o binário Linux. Instale o Go dentro da distribuição ou compile e
 
 ```bash
 CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
-  go build -trimpath -ldflags="-s -w" -o mcjava-manager ./cmd/mcjava-manager
+  go build -buildvcs=false -trimpath -ldflags="-s -w" -o mcjava-manager ./cmd/mcjava-manager
 ```
 
 Instâncias que ficam no Windows podem ser acessadas por `/mnt/c/...`:
@@ -240,7 +240,7 @@ pkg install golang git
 ```bash
 git clone https://github.com/wedemmmdev/mcjava-manager.git
 cd mcjava-manager
-CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o mcjava-manager ./cmd/mcjava-manager
+CGO_ENABLED=0 go build -buildvcs=false -trimpath -ldflags="-s -w" -o mcjava-manager ./cmd/mcjava-manager
 mkdir -p "$PREFIX/bin"
 mv mcjava-manager "$PREFIX/bin/mcjava-manager"
 ```
@@ -291,27 +291,27 @@ mkdir -p dist
 ```bash
 # Linux x86_64
 CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
-  go build -trimpath -ldflags="-s -w" -o dist/mcjava-manager-linux-amd64 ./cmd/mcjava-manager
+  go build -buildvcs=false -trimpath -ldflags="-s -w" -o dist/mcjava-manager-linux-amd64 ./cmd/mcjava-manager
 
 # Linux ARM64
 CGO_ENABLED=0 GOOS=linux GOARCH=arm64 \
-  go build -trimpath -ldflags="-s -w" -o dist/mcjava-manager-linux-arm64 ./cmd/mcjava-manager
+  go build -buildvcs=false -trimpath -ldflags="-s -w" -o dist/mcjava-manager-linux-arm64 ./cmd/mcjava-manager
 
 # Linux ARMv7
 CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=7 \
-  go build -trimpath -ldflags="-s -w" -o dist/mcjava-manager-linux-armv7 ./cmd/mcjava-manager
+  go build -buildvcs=false -trimpath -ldflags="-s -w" -o dist/mcjava-manager-linux-armv7 ./cmd/mcjava-manager
 
 # macOS Intel
 CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 \
-  go build -trimpath -ldflags="-s -w" -o dist/mcjava-manager-darwin-amd64 ./cmd/mcjava-manager
+  go build -buildvcs=false -trimpath -ldflags="-s -w" -o dist/mcjava-manager-darwin-amd64 ./cmd/mcjava-manager
 
 # macOS Apple Silicon
 CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 \
-  go build -trimpath -ldflags="-s -w" -o dist/mcjava-manager-darwin-arm64 ./cmd/mcjava-manager
+  go build -buildvcs=false -trimpath -ldflags="-s -w" -o dist/mcjava-manager-darwin-arm64 ./cmd/mcjava-manager
 
 # Windows x86_64
 CGO_ENABLED=0 GOOS=windows GOARCH=amd64 \
-  go build -trimpath -ldflags="-s -w" -o dist/mcjava-manager-windows-amd64.exe ./cmd/mcjava-manager
+  go build -buildvcs=false -trimpath -ldflags="-s -w" -o dist/mcjava-manager-windows-amd64.exe ./cmd/mcjava-manager
 ```
 
 ## Verificação pós-instalação
@@ -362,7 +362,7 @@ go install github.com/wedemmmdev/mcjava-manager/cmd/mcjava-manager@latest
 
 ```bash
 git pull
-CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o mcjava-manager ./cmd/mcjava-manager
+CGO_ENABLED=0 go build -buildvcs=false -trimpath -ldflags="-s -w" -o mcjava-manager ./cmd/mcjava-manager
 ```
 
 Substitua o binário antigo. O manifesto e o conteúdo das instâncias não são alterados ao atualizar o executável.
@@ -429,6 +429,35 @@ A TUI só é aberta quando uma instância é informada. Sem `--instance` nem arg
 
 Verifique a conexão com a internet e se o acesso a `api.modrinth.com` e aos servidores de download do Modrinth não está bloqueado por firewall, proxy ou antivírus.
 
+### `error obtaining VCS status: exit status 128`
+
+O Go tenta incorporar informações do Git no binário durante o build. Em alguns ambientes, especialmente Termux com o projeto em armazenamento compartilhado, o comando `git status` pode falhar por diferença de proprietário ou permissões, e o build é abortado.
+
+Desative o carimbo de VCS:
+
+```bash
+CGO_ENABLED=0 go build -buildvcs=false -trimpath -ldflags="-s -w" \
+  -o mcjava-manager ./cmd/mcjava-manager
+```
+
+Para `go install`, o equivalente é:
+
+```bash
+GOFLAGS=-buildvcs=false go install github.com/wedemmmdev/mcjava-manager/cmd/mcjava-manager@latest
+```
+
+Se você precisa manter as informações de VCS e confia no diretório, marque-o como seguro:
+
+```bash
+git config --global --add safe.directory "$(pwd)"
+```
+
+Só use `safe.directory` em repositórios que você mesmo clonou ou controla.
+
+### `mv: cannot stat 'mcjava-manager': No such file or directory`
+
+O `mv` só funciona depois que o build termina com sucesso. Se o `go build` falhou, corrija o erro exibido antes de executar o `mv` novamente.
+
 ### Go antigo demais
 
 Se o build falhar com erro de versão do módulo, atualize o Go para 1.24.2 ou superior e tente novamente.
@@ -439,7 +468,7 @@ Use:
 
 ```powershell
 $env:CGO_ENABLED = "0"
-go build -trimpath -ldflags="-s -w" -o mcjava-manager.exe .\cmd\mcjava-manager
+go build -buildvcs=false -trimpath -ldflags="-s -w" -o mcjava-manager.exe .\cmd\mcjava-manager
 ```
 
 ### `arquivo já existe` ao instalar
